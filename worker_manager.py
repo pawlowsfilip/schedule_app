@@ -1,12 +1,14 @@
 from worker import Worker
+from time_utils import *
 
 
 class Worker_Manager:
     def __init__(self):
         self.workers_list = []
 
-    def add_worker(self, name, availability, position=None, worse_availability=None):
-        worker = Worker(name=name, availability=availability, position=position, worse_availability=worse_availability)
+    def add_worker(self, name, worker_availability, position=None, worse_availability=None):
+        worker = Worker(name=name, availability=worker_availability,
+                        position=position, worse_availability=worse_availability)
         self.workers_list.append(worker)
 
     def remove_worker(self, worker):
@@ -22,14 +24,23 @@ class Worker_Manager:
                 if key == day:
                     return worker.availability[day]
 
-    def get_available_workers_via_availability(self, day, time_frame, position):
+    def get_position(self, worker):
         for worker in self.workers_list:
-            for key in worker.availability.keys():
-                if key == day:
-                    if worker.availability[day] in time_frame:
-                        return worker.name, worker.availability[day]
-                    # trzeba zmienić tutaj time frame na jakiś typ danych dlatego zeby wyszukac czy miescie sie
-                    # przedziale
+            return worker.position
+
+    def check_availability(self, worker, day, required_start, required_end):
+        return is_available(worker.availability[day], required_start, required_end)
+
+    def get_available_workers_via_availability(self, day, time_frame, position=None):
+        workers_list = []
+        required_start, required_end = time_frame_split(time_frame)
+        for worker in self.workers_list:
+            if position is None or self.get_position(worker) == position:
+                if day in self.get_days():
+                    if self.check_availability(worker, day, required_start, required_end):
+                        workers_list.append(worker)
+
+        return workers_list
 
     def get_available_workers_via_worse_availability(self, day, time_frame, position):
         # trzeba zmienić tutaj time frame na jakiś typ danych dlatego zeby wyszukac czy miescie sie
@@ -44,4 +55,3 @@ class Worker_Manager:
 
     def get_workers_worse_available_on_day(self, day):
         pass
-

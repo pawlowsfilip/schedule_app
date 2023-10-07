@@ -11,5 +11,5 @@ if __name__ == '__main__':
 
     print(worker_manager1.get_days())
     print(worker_manager1.get_hours('22.07'))
-    worker_list = worker_manager1.get_available_workers_via_availability('21.07', '7:00-23:00')
+    worker_list = worker_manager1.get_available_workers_via_availability('21.07', '7:00-18:00')
     print(worker_list[-1].name)
