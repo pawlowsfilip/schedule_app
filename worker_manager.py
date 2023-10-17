@@ -1,10 +1,12 @@
 from worker import Worker
-from time_utils import *
 
 
 class Worker_Manager:
-    def __init__(self):
-        self.workers_list = []
+    def __init__(self, workers):
+        self.workers_list = self.make_workers(workers)
+
+    def make_workers(self, workers):        # wyciąganie info z workera z GUI i wrzucenie do listy
+        pass
 
     def add_worker(self, name, worker_availability, worse_availability=None, position=None):
         worker = Worker(name=name, availability=worker_availability,
@@ -23,10 +25,6 @@ class Worker_Manager:
             for key in worker.availability.keys():
                 if key == day:
                     return worker.availability[day]
-
-    def get_position(self, worker):
-        for worker in self.workers_list:
-            return worker.position
 
     @staticmethod
     def check_availability(worker, day, required_start, required_end):
@@ -55,9 +53,6 @@ class Worker_Manager:
                     if self.check_worse_availability(worker, day, required_start, required_end):
                         workers_list.append(worker)
         return workers_list
-
-    def is_worker_available(self):
-        pass
 
     def get_workers_available_on_day(self, day):
         pass
