@@ -8,7 +8,7 @@ class Worker:
         self._worse_availability = worse_availability
         self.position = position
 
-    def is_available(self, day, time):
+    def is_available(self, day, time):    # wyciagnij klucz i wartosc z availability (słownika) i porównaj z day i time
         pass
 
     @staticmethod
