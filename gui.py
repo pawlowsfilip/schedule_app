@@ -1,4 +1,5 @@
 from scheduler import scheduler
+import scheduler_factory
 
 
 class Gui:

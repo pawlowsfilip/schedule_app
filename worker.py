@@ -8,8 +8,48 @@ class Worker:
         self._worse_availability = worse_availability
         self.position = position
 
-    def is_available(self, day, time):    # wyciagnij klucz i wartosc z availability (słownika) i porównaj z day i time
-        pass
+    def __str__(self):
+        return f"Name: {self.name}, Position: {self.position}, Availability: {self._availability}, Worse availability: {self._worse_availability}"
+
+    def get_name(self):
+        return self.name
+
+    def get_position(self):
+        return self.position
+
+    def get_availability(self):
+        return self._availability
+
+    def get_worse_availability(self):
+        return self._worse_availability
+
+    def is_available(self, required_day, required_time):
+        if required_day not in self._availability:
+            return False
+
+        day_availability = self._process_availability(self._availability[required_day])
+        required_start_str, required_end_str = required_time.split('-')
+        required_start = self._str_to_time(required_start_str)
+        required_end = self._str_to_time(required_end_str)
+
+        for worker_start, worker_end in day_availability:
+            if self._is_overlap(worker_start, worker_end, required_start, required_end):
+                return True
+        return False
+
+    def is_available_if_needed(self, required_day, required_time):
+        if required_day not in self._worse_availability:
+            return False
+
+        day_availability = self._process_availability(self._worse_availability[required_day])
+        required_start_str, required_end_str = required_time.split('-')
+        required_start = self._str_to_time(required_start_str)
+        required_end = self._str_to_time(required_end_str)
+
+        for worker_start, worker_end in day_availability:
+            if self._is_overlap(worker_start, worker_end, required_start, required_end):
+                return True
+        return False
 
     @staticmethod
     def _str_to_time(time_str):
@@ -37,10 +77,6 @@ class Worker:
 
         return time_tuples
 
-    def _availability(self):
-        return self._process_availability(self._availability.keys())  # wyciagnac klucz z availability i zrobic prywatnie (idk)
-
-    def _is_available(self, availability_str, required_start, required_end):
-        return any(self._is_overlap(worker_start, worker_end, self._str_to_time(required_start),
-                                    self._str_to_time(required_end))
-                   for worker_start, worker_end in self._availability(availability_str))
+    @property
+    def availability(self):
+        return self._availability
