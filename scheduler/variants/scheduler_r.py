@@ -177,78 +177,45 @@ class Scheduler_r(Scheduler):
     def make_schedule(self):
         positions = set([worker.position for worker in self.worker_manager.workers_list])
         days = self.worker_manager.get_days()
-        time_frames = self._get_time_frames_list()  # Get the list of time frames for the day
+        time_frames = self._get_time_frames_list()  # Time frames generated for the day
 
         # Initialize an empty schedule
         self.schedule = {day: {time_frame: [] for time_frame in time_frames} for day in days}
 
         for day in days:
             for position in positions:
+                previous_worker = None  # Initialize the tracking of the previous worker
                 for index, time_frame in enumerate(time_frames):
                     needed_workers = self.get_needed_workers_for_time_frame(time_frame)
-                    # Track workers already assigned to this time frame
-                    assigned_workers_for_time_frame = []
 
-                    while len(self.schedule[day][time_frame]) < needed_workers:
-                        worker_added = False
+                    # Assign previous worker if still available and needed
+                    if previous_worker and previous_worker.is_available(day, time_frame) \
+                            and len(self.schedule[day][time_frame]) < needed_workers:
+                        self.schedule[day][time_frame].append(previous_worker)
 
-                        # Check all conditions to find a suitable worker
-                        # 1. Try previous worker
-                        previous_worker = self._get_previous_time_frame_worker(day, index)
-                        if previous_worker and previous_worker.is_available(day, time_frame) \
-                                and previous_worker not in assigned_workers_for_time_frame:
-                            self.schedule[day][time_frame].append(previous_worker)
-                            assigned_workers_for_time_frame.append(previous_worker)
-                            worker_added = True
-                            break
+                    # If the needed workers for this time frame are already assigned, continue to the next time frame
+                    if len(self.schedule[day][time_frame]) >= needed_workers:
+                        continue
 
-                        # 2. Try to prioritize the least used worker
-                        if not worker_added:
-                            least_used_workers = self._get_least_used_workers()
-                            for worker in least_used_workers:
-                                if worker.position == position and worker.is_available(day, time_frame) \
-                                        and worker not in assigned_workers_for_time_frame:
-                                    self.schedule[day][time_frame].append(worker)
-                                    assigned_workers_for_time_frame.append(worker)
-                                    worker_added = True
-                                    break
+                    """
+                    Add prio for position
+                    """
 
-                        # 3. Take with normal availability
-                        if not worker_added:
-                            available_workers = self.worker_manager.get_available_workers(day, time_frame)
-                            for worker in available_workers:
-                                if len(self.schedule[day][time_frame]) < needed_workers:
-                                    if worker.position == position and worker not in assigned_workers_for_time_frame:
-                                        self.schedule[day][time_frame].append(worker)
-                                        assigned_workers_for_time_frame.append(worker)
-                                        worker_added = True
-                                        break
+                    # Check for additional workers from the pool of least used, normally available, and worse available workers
+                    for worker in self.worker_manager.workers_list:
+                        if worker not in self.schedule[day][time_frame] and len(
+                                self.schedule[day][time_frame]) < needed_workers:
+                            # Check availability
+                            if worker.is_available(day, time_frame) or worker.is_available_if_needed(day, time_frame):
+                                self.schedule[day][time_frame].append(worker)
+                                previous_worker = worker  # Update the previous worker for continuity
+                                if len(self.schedule[day][time_frame]) >= needed_workers:
+                                    break  # Stop assigning more workers if the needed count is reached
 
-                        # 4. Check the worse availability
-                        if not worker_added:
-                            available_workers_if_needed = self.worker_manager.get_available_workers_if_needed(day,
-                                                                                                              time_frame)
-                            for worker in available_workers_if_needed:
-                                if len(self.schedule[day][time_frame]) < needed_workers:
-                                    if worker.position == position and worker not in assigned_workers_for_time_frame:
-                                        self.schedule[day][time_frame].append(worker)
-                                        assigned_workers_for_time_frame.append(worker)
-                                        worker_added = True
-                                        break
-
-                        # If no worker was added and needed workers are not met, leave the slot as is
-                        if not worker_added:
-                            break  # Exit the while loop since no more workers can be added
-
-                        # Check if we've met or exceeded the needed number of workers for this time frame
-                        if len(assigned_workers_for_time_frame) >= needed_workers:
-                            break  # Enough workers have been assigned
-
-                        if len(self.schedule[day][time_frame]) < needed_workers:
-                            # Handle the case where not enough workers are available as needed
-                            print(
-                                f"Not enough workers for {day} in time frame {time_frame}. Needed: {needed_workers},"
-                                f" Assigned: {len(self.schedule[day][time_frame])}")
+                    # Print warning if not enough workers were found for this time frame
+                    if len(self.schedule[day][time_frame]) < needed_workers:
+                        print(
+                            f"Not enough workers for {day} in time frame {time_frame}. Needed: {needed_workers}, Assigned: {len(self.schedule[day][time_frame])}")
 
         return self.schedule
 

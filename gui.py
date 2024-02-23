@@ -15,9 +15,6 @@ test1 = Gui("R")
 test_schedule = test1.make_schedule()
 print(test_schedule)
 
-"""
-czasami są jakieś dziwne błedy ze na alokacji 1 dodaje mi druga osobe idk czemu
-"""
 
 
 def print_schedule(schedule):
