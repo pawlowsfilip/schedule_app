@@ -22,7 +22,7 @@ class Worker_Manager:
             while True:
                 name = input("Enter workers name (or type 'exit' to finish): ")
                 if name.lower() == 'exit':
-                    break
+                    return workers_list
 
                 position = input("Enter worker's position: ")
                 availability = input("Enter worker's availability: ")
@@ -31,7 +31,6 @@ class Worker_Manager:
                 worker = Worker(name, availability, worse_availability, position)
 
                 workers_list.append(worker)
-
         return workers_list
 
     def get_available_workers(self, day, time_frame):

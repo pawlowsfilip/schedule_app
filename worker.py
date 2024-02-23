@@ -24,18 +24,16 @@ class Worker:
         return self._worse_availability
 
     def is_available(self, required_day, required_time):
-        if required_day not in self._availability:
+        if required_day in self._availability:
+            day_availability = self._process_availability(self._availability[required_day])
+            required_start_str, required_end_str = required_time.split('-')
+            required_start = self._str_to_time(required_start_str)
+            required_end = self._str_to_time(required_end_str)
+
+            for worker_start, worker_end in day_availability:
+                if self._is_overlap(worker_start, worker_end, required_start, required_end):
+                    return True
             return False
-
-        day_availability = self._process_availability(self._availability[required_day])
-        required_start_str, required_end_str = required_time.split('-')
-        required_start = self._str_to_time(required_start_str)
-        required_end = self._str_to_time(required_end_str)
-
-        for worker_start, worker_end in day_availability:
-            if self._is_overlap(worker_start, worker_end, required_start, required_end):
-                return True
-        return False
 
     def is_available_if_needed(self, required_day, required_time):
         if required_day not in self._worse_availability:
@@ -57,7 +55,8 @@ class Worker:
 
     @staticmethod
     def _is_overlap(worker_start, worker_end, required_start, required_end):
-        return (worker_start <= required_end) and (worker_end >= required_start)
+        return ((worker_start <= required_start < worker_end) or
+                (required_start <= worker_start < required_end))
 
     @staticmethod
     def _time_frame_split(time_frame):
@@ -80,3 +79,5 @@ class Worker:
     @property
     def availability(self):
         return self._availability
+
+
