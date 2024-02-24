@@ -2,8 +2,9 @@ from worker import Worker
 
 
 class Worker_Manager:
-    def __init__(self, *workers):
+    def __init__(self, *workers, position_priority=None):
         self.workers_list = self.make_workers(*workers)
+        self.position_priority = position_priority if position_priority is not None else {}
 
     def __str__(self):
         worker_info = ""
@@ -32,6 +33,17 @@ class Worker_Manager:
 
                 workers_list.append(worker)
         return workers_list
+
+    def _set_position_priority(self, priority_dict):
+        """
+        Set or update the priority for positions dynamically.
+        Example usage:
+            worker_manager.set_position_priority({'CEO': 1, 'Manager': 2, 'Worker': 3, 'Student': 4})
+        """
+        self.position_priority = priority_dict
+
+    def _get_position_priority(self, position):
+        return self.position_priority[position]
 
     def get_available_workers(self, day, time_frame):
         available_workers = []
