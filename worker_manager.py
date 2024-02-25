@@ -4,6 +4,7 @@ from worker import Worker
 class Worker_Manager:
     def __init__(self, *workers):
         self.workers_list = self.make_workers(*workers)
+        self.position_priorities = {}
 
     def __str__(self):
         worker_info = ""
@@ -32,6 +33,35 @@ class Worker_Manager:
 
                 workers_list.append(worker)
         return workers_list
+
+    def set_position_priorities(self, priorities):
+        """
+        Dynamically sets or updates the priorities of positions.
+        The priorities parameter should be a dictionary mapping position names to their priorities.
+        Lower numbers indicate higher priority.
+
+        :param priorities: Dict[str, int]
+        """
+        self.position_priorities = priorities
+
+    def _get_position_priority(self, position):
+        """
+        Retrieves the priority of a given position.
+        If the position is not found, a default high priority number is returned,
+        ensuring it is treated as lower priority compared to defined ones.
+
+        :param position: str
+        :return: int
+        """
+        return self.position_priorities.get(position, 9999)
+
+    def get_sorted_workers_by_position_priority(self):
+        """
+        Returns workers sorted by their position priority.
+        Workers without a defined position are treated as the lowest priority.
+        """
+        # Sort workers based on the position priority, then by name or another attribute for consistency.
+        return sorted(self.workers_list, key=lambda worker: self._get_position_priority(worker.position), reverse=True)
 
     def get_available_workers(self, day, time_frame):
         available_workers = []
