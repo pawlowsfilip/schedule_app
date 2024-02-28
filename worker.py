@@ -34,20 +34,22 @@ class Worker:
                 if self._is_overlap(worker_start, worker_end, required_start, required_end):
                     return True
             return False
-
-    def is_available_if_needed(self, required_day, required_time):
-        if required_day not in self._worse_availability:
+        else:
             return False
 
-        day_availability = self._process_availability(self._worse_availability[required_day])
-        required_start_str, required_end_str = required_time.split('-')
-        required_start = self._str_to_time(required_start_str)
-        required_end = self._str_to_time(required_end_str)
+    def is_available_if_needed(self, required_day, required_time):
+        if required_day in self._worse_availability:
+            day_availability = self._process_availability(self._worse_availability[required_day])
+            required_start_str, required_end_str = required_time.split('-')
+            required_start = self._str_to_time(required_start_str)
+            required_end = self._str_to_time(required_end_str)
 
-        for worker_start, worker_end in day_availability:
-            if self._is_overlap(worker_start, worker_end, required_start, required_end):
-                return True
-        return False
+            for worker_start, worker_end in day_availability:
+                if self._is_overlap(worker_start, worker_end, required_start, required_end):
+                    return True
+            return False
+        else:
+            return False
 
     @staticmethod
     def _str_to_time(time_str):
