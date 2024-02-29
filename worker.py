@@ -62,6 +62,10 @@ class Worker:
 
     @staticmethod
     def _time_frame_split(time_frame):
+        if not isinstance(time_frame, str):
+            raise ValueError("Time frame must be a string.")
+        if '-' not in time_frame or len(time_frame.split('-')) != 2:
+            raise ValueError("Invalid time frame format. Use 'HH:MM-HH:MM'.")
         start, end = time_frame.split('-')
         return start, end
 

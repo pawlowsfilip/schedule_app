@@ -83,3 +83,66 @@ def test_str_to_time_invalid_input():
         assert Worker._str_to_time("John:Doe") == time(00, 00)
     with pytest.raises(ValueError):
         assert Worker._str_to_time("John Doe") == time(00, 00)
+
+
+def test_is_overlap_exact_hours():
+    worker_start = Worker._str_to_time("8:00")
+    worker_end = Worker._str_to_time("13:00")
+    required_start = Worker._str_to_time("8:00")
+    required_end = Worker._str_to_time("13:00")
+    assert Worker._is_overlap(worker_start, worker_end, required_start, required_end) is True
+
+
+def test_is_overlap_inside_time_frame():
+    worker_start = Worker._str_to_time("8:00")
+    worker_end = Worker._str_to_time("13:00")
+    required_start = Worker._str_to_time("7:00")
+    required_end = Worker._str_to_time("14:00")
+    assert Worker._is_overlap(worker_start, worker_end, required_start, required_end) is True
+
+
+def test_is_overlap_in_first_half():
+    worker_start = Worker._str_to_time("8:00")
+    worker_end = Worker._str_to_time("13:00")
+    required_start = Worker._str_to_time("6:00")
+    required_end = Worker._str_to_time("11:00")
+    assert Worker._is_overlap(worker_start, worker_end, required_start, required_end) is True
+
+
+def test_is_overlap_in_second_half():
+    worker_start = Worker._str_to_time("8:00")
+    worker_end = Worker._str_to_time("13:00")
+    required_start = Worker._str_to_time("11:00")
+    required_end = Worker._str_to_time("16:00")
+    assert Worker._is_overlap(worker_start, worker_end, required_start, required_end) is True
+
+
+def test_is_overlap_last_minute():
+    worker_start = Worker._str_to_time("8:00")
+    worker_end = Worker._str_to_time("13:00")
+    required_start = Worker._str_to_time("12:59")
+    required_end = Worker._str_to_time("19:00")
+    assert Worker._is_overlap(worker_start, worker_end, required_start, required_end) is True
+
+
+def test_is_not_overlap():
+    worker_start = Worker._str_to_time("8:00")
+    worker_end = Worker._str_to_time("13:00")
+    required_start = Worker._str_to_time("13:01")
+    required_end = Worker._str_to_time("16:00")
+    assert Worker._is_overlap(worker_start, worker_end, required_start, required_end) is False
+
+
+def test_time_frame_split_correctly():
+    time_frame = "12:00-13:00"
+    assert Worker._time_frame_split(time_frame) == ("12:00", "13:00")
+
+
+def test_time_frame_split_one_hour():
+    time_frame = "12:00"
+    with pytest.raises(ValueError):
+        assert Worker._time_frame_split(time_frame)
+
+"""
+TBD
+"""
