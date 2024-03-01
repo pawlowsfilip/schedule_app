@@ -1,7 +1,4 @@
-import random
-
 from scheduler.scheduler import Scheduler
-from worker_manager import Worker_Manager
 from datetime import datetime, timedelta
 
 
