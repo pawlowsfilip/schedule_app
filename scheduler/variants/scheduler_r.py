@@ -1,7 +1,4 @@
-import random
-
 from scheduler.scheduler import Scheduler
-from worker_manager import Worker_Manager
 from datetime import datetime, timedelta
 
 
@@ -19,7 +16,8 @@ class Scheduler_r(Scheduler):
         super().__init__(variant)
 
         self.accuracy = accuracy
-        self.allocation = allocation  # {"7:00-10:00": 1, ...} z tego mozna wyciagnac kiedyy poczatek i koniec pracy i ilosc pracownnikow
+        self.allocation = allocation  # {"7:00-10:00": 1, ...}
+        self.variant = variant
         self.schedule = {}
 
     def _get_working_hours(self):
@@ -49,7 +47,7 @@ class Scheduler_r(Scheduler):
 
         return earliest_start_str, latest_end_str
 
-    def _number_of_time_frames_per_day(self, accuracy):
+    def _number_of_time_frames_per_day(self):
         """
         Calculates the number of time frames per day based on the desired accuracy.
 
@@ -66,48 +64,9 @@ class Scheduler_r(Scheduler):
 
         # calculate the time frame in minutes
         total_time = (end_time - start_time).total_seconds() / 60
-        time_frame_duration = int(accuracy * 60)
+        time_frame_duration = int(self.accuracy * 60)
 
         return int(total_time / time_frame_duration)
-
-    def _get_previous_time_frame_worker(self, current_day, current_time_frame):
-        sorted_time_frames = self._get_time_frames_list()  # This needs to return time frames in sorted order
-        current_index = sorted_time_frames.index(current_time_frame)
-
-        if current_index > 0:
-            previous_time_frame = sorted_time_frames[current_index - 1]
-            previous_workers = self.schedule.get(current_day, {}).get(previous_time_frame, [])
-
-            for worker in previous_workers:
-                if worker.is_available(current_day, current_time_frame):
-                    return worker
-
-        return None
-
-    def _get_least_used_workers(self):
-        """
-        Identifies and returns a worker with the minimum usage count within the schedule.
-
-        Returns:
-            str or None: The name of a randomly selected worker with the least usage count,
-                        or None if no workers are available.
-        """
-        worker_counts = {}
-        least_usage = float('inf')
-        least_used_workers = []
-
-        for day, day_info in self.schedule.items():
-            for timestamp, workers in day_info.items():
-                for worker in workers:
-                    count = worker_counts.get(worker, 0) + 1
-                    worker_counts[worker] = count
-
-                    if count <= least_usage:
-                        least_usage = count
-                    if count == least_usage:
-                        least_used_workers.append(worker)
-
-        return least_used_workers
 
     def _get_time_frames_list(self):
         start, end = self._get_working_hours()
@@ -126,19 +85,6 @@ class Scheduler_r(Scheduler):
             current_time = next_time
 
         return time_frames
-
-    def get_needed_workers_for_time_frame(self, current_time_frame):
-        current_start_str, current_end_str = current_time_frame.split('-')
-        current_start = self._parse_time(current_start_str)
-        current_end = self._parse_time(current_end_str)
-
-        for time_range, workers_needed in self.allocation.items():
-            start_str, end_str = time_range.split('-')
-            start_time = self._parse_time(start_str)
-            end_time = self._parse_time(end_str)
-
-            if (start_time <= current_start < end_time) or (start_time < current_end <= end_time):
-                return workers_needed
 
     def make_schedule(self):
         days = self.worker_manager.get_days()
@@ -195,7 +141,3 @@ class Scheduler_r(Scheduler):
                     workers.append("No worker available")
 
         return self.schedule
-
-    @staticmethod
-    def _parse_time(time_str):
-        return datetime.strptime(time_str, "%H:%M").time()
