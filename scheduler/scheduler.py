@@ -1,9 +1,10 @@
 from worker_manager import Worker_Manager
 from worker import Worker
 from datetime import datetime, timedelta
+from abc import ABC, abstractmethod
 
 
-class Scheduler:
+class Scheduler(ABC):
     def __init__(self, variant):
         worker1 = Worker('Filip', {'21.07': '8:00-10:00'}, {}, 'Manager')
         worker2 = Worker('Natalia', {'21.07': '8:00-10:00'}, {}, 'Regular')
@@ -44,27 +45,6 @@ class Scheduler:
 
         return earliest_start_str, latest_end_str
 
-    def _number_of_time_frames_per_day(self, accuracy):
-        """
-        Calculates the number of time frames per day based on the desired accuracy.
-
-        Args:
-            accuracy (float): Desired accuracy of the scheduling process (accuracy of 1hr, 0.5hr, 0.25hr etc).
-
-        Returns:
-            int: The number of time frames per day.
-        """
-        start, end = self._get_working_hours()
-        # having the strptime because it is easier to subtract end from start
-        start_time = datetime.strptime(start, '%H:%M')
-        end_time = datetime.strptime(end, '%H:%M')
-
-        # calculate the time frame in minutes
-        total_time = (end_time - start_time).total_seconds() / 60
-        time_frame_duration = int(accuracy * 60)
-
-        return int(total_time / time_frame_duration)
-
     def _get_least_used_workers(self):
         """
         Identifies and returns a worker with the minimum usage count within the schedule.
@@ -89,24 +69,6 @@ class Scheduler:
                         least_used_workers.append(worker)
 
         return least_used_workers
-
-    def _get_time_frames_list(self):
-        start, end = self._get_working_hours()
-        start_time = datetime.strptime(start, '%H:%M')
-        end_time = datetime.strptime(end, '%H:%M')
-        accuracy_minutes = int(self.accuracy * 60)
-        time_frames = []
-
-        current_time = start_time
-
-        while current_time < end_time:
-            next_time = current_time + timedelta(minutes=accuracy_minutes)
-            next_time = min(next_time, end_time)
-            time_frame_str = f"{current_time.strftime('%H:%M')}-{next_time.strftime('%H:%M')}"
-            time_frames.append(time_frame_str)
-            current_time = next_time
-
-        return time_frames
 
     def get_needed_workers_for_time_frame(self, current_time_frame):
         current_start_str, current_end_str = current_time_frame.split('-')
@@ -138,3 +100,8 @@ class Scheduler:
     @staticmethod
     def _parse_time(time_str):
         return datetime.strptime(time_str, "%H:%M").time()
+
+    @abstractmethod
+    def _get_time_frames_list(self):
+        """Generates a list of time frames for the day."""
+        pass

@@ -17,7 +17,47 @@ class Scheduler_r(Scheduler):
 
         self.accuracy = accuracy
         self.allocation = allocation  # {"7:00-10:00": 1, ...}
+        self.variant = variant
         self.schedule = {}
+
+    def _number_of_time_frames_per_day(self):
+        """
+        Calculates the number of time frames per day based on the desired accuracy.
+
+        Args:
+            accuracy (float): Desired accuracy of the scheduling process (accuracy of 1hr, 0.5hr, 0.25hr etc).
+
+        Returns:
+            int: The number of time frames per day.
+        """
+        start, end = self._get_working_hours()
+        # having the strptime because it is easier to subtract end from start
+        start_time = datetime.strptime(start, '%H:%M')
+        end_time = datetime.strptime(end, '%H:%M')
+
+        # calculate the time frame in minutes
+        total_time = (end_time - start_time).total_seconds() / 60
+        time_frame_duration = int(self.accuracy * 60)
+
+        return int(total_time / time_frame_duration)
+
+    def _get_time_frames_list(self):
+        start, end = self._get_working_hours()
+        start_time = datetime.strptime(start, '%H:%M')
+        end_time = datetime.strptime(end, '%H:%M')
+        accuracy_minutes = int(self.accuracy * 60)
+        time_frames = []
+
+        current_time = start_time
+
+        while current_time < end_time:
+            next_time = current_time + timedelta(minutes=accuracy_minutes)
+            next_time = min(next_time, end_time)
+            time_frame_str = f"{current_time.strftime('%H:%M')}-{next_time.strftime('%H:%M')}"
+            time_frames.append(time_frame_str)
+            current_time = next_time
+
+        return time_frames
 
     def make_schedule(self):
         days = self.worker_manager.get_days()
