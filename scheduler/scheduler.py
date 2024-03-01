@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 
 class Scheduler(ABC):
     def __init__(self, variant):
-        worker1 = Worker('Filip', {'21.07': '8:00-10:00'}, {}, 'Manager')
+        worker1 = Worker('Filip', {'21.07': '8:00-10:00'}, {'21.07': '7:00-10:00'}, 'Manager')
         worker2 = Worker('Natalia', {'21.07': '8:00-10:00'}, {}, 'Regular')
         worker3 = Worker('Ola', {'21.07': '8:00-9:00'}, {'21.07': '10:00-14:00'}, 'Student')
         worker4 = Worker('Kondziu', {'21.07': '10:00-14:00'}, {'21.07': '10:00-14:00'}, 'Student')
@@ -17,33 +17,6 @@ class Scheduler(ABC):
         self.schedule = {}
         # self.worker_manager = Worker_Manager()
         self.worker_manager = wm1
-
-    def _get_working_hours(self):
-        """
-        Calculates the earliest start time and latest end time from the allocated time frames.
-
-        Returns:
-            tuple(str, str) or tuple(None, None): A tuple containing the earliest start time (HH:MM)
-                                                and latest end time (HH:MM), or (None, None)
-                                                if no time frames are allocated.
-        """
-        earliest_start = None
-        latest_end = None
-
-        for time_range in self.allocation.keys():
-            start_str, end_str = time_range.split("-")
-            start_time = self._parse_time(start_str)
-            end_time = self._parse_time(end_str)
-
-            if earliest_start is None or start_time < earliest_start:
-                earliest_start = start_time
-            if latest_end is None or end_time > latest_end:
-                latest_end = end_time
-
-        earliest_start_str = earliest_start.strftime('%H:%M') if earliest_start else None
-        latest_end_str = latest_end.strftime('%H:%M') if latest_end else None
-
-        return earliest_start_str, latest_end_str
 
     def _get_least_used_workers(self):
         """
@@ -104,4 +77,12 @@ class Scheduler(ABC):
     @abstractmethod
     def _get_time_frames_list(self):
         """Generates a list of time frames for the day."""
+        pass
+
+    @abstractmethod
+    def make_schedule(self):
+        pass
+
+    @abstractmethod
+    def _get_working_hours(self):
         pass
