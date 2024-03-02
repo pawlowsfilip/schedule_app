@@ -18,44 +18,6 @@ class Scheduler(ABC):
         # self.worker_manager = Worker_Manager()
         self.worker_manager = wm1
 
-    def _get_least_used_workers(self):
-        """
-        Identifies and returns a worker with the minimum usage count within the schedule.
-
-        Returns:
-            str or None: The name of a randomly selected worker with the least usage count,
-                        or None if no workers are available.
-        """
-        worker_counts = {}
-        least_usage = float('inf')
-        least_used_workers = []
-
-        for day, day_info in self.schedule.items():
-            for timestamp, workers in day_info.items():
-                for worker in workers:
-                    count = worker_counts.get(worker, 0) + 1
-                    worker_counts[worker] = count
-
-                    if count <= least_usage:
-                        least_usage = count
-                    if count == least_usage:
-                        least_used_workers.append(worker)
-
-        return least_used_workers
-
-    def get_needed_workers_for_time_frame(self, current_time_frame):
-        current_start_str, current_end_str = current_time_frame.split('-')
-        current_start = self._parse_time(current_start_str)
-        current_end = self._parse_time(current_end_str)
-
-        for time_range, workers_needed in self.allocation.items():
-            start_str, end_str = time_range.split('-')
-            start_time = self._parse_time(start_str)
-            end_time = self._parse_time(end_str)
-
-            if (start_time <= current_start < end_time) or (start_time < current_end <= end_time):
-                return workers_needed
-
     def _get_previous_time_frame_worker(self, current_day, current_time_frame):
         sorted_time_frames = self._get_time_frames_list()  # This needs to return time frames in sorted order
         current_index = sorted_time_frames.index(current_time_frame)
@@ -70,9 +32,9 @@ class Scheduler(ABC):
 
         return None
 
-    @staticmethod
-    def _parse_time(time_str):
-        return datetime.strptime(time_str, "%H:%M").time()
+    @abstractmethod
+    def _get_least_used_workers(self):
+        pass
 
     @abstractmethod
     def _get_time_frames_list(self):
@@ -86,3 +48,11 @@ class Scheduler(ABC):
     @abstractmethod
     def _get_working_hours(self):
         pass
+
+    @abstractmethod
+    def get_needed_workers_for_time_frame(self, current_time_frame):
+        pass
+
+    @staticmethod
+    def _parse_time(time_str):
+        return datetime.strptime(time_str, "%H:%M").time()
