@@ -86,6 +86,44 @@ class Scheduler_r(Scheduler):
 
         return time_frames
 
+    def get_needed_workers_for_time_frame(self, current_time_frame):
+        current_start_str, current_end_str = current_time_frame.split('-')
+        current_start = self._parse_time(current_start_str)
+        current_end = self._parse_time(current_end_str)
+
+        for time_range, workers_needed in self.allocation.items():
+            start_str, end_str = time_range.split('-')
+            start_time = self._parse_time(start_str)
+            end_time = self._parse_time(end_str)
+
+            if (start_time <= current_start < end_time) or (start_time < current_end <= end_time):
+                return workers_needed
+
+    def _get_least_used_workers(self):
+        """
+        Identifies and returns a worker with the minimum usage count within the schedule.
+
+        Returns:
+            str or None: The name of a randomly selected worker with the least usage count,
+                        or None if no workers are available.
+        """
+        worker_counts = {}
+        least_usage = float('inf')
+        least_used_workers = []
+
+        for day, day_info in self.schedule.items():
+            for timestamp, workers in day_info.items():
+                for worker in workers:
+                    count = worker_counts.get(worker, 0) + 1
+                    worker_counts[worker] = count
+
+                    if count <= least_usage:
+                        least_usage = count
+                    if count == least_usage:
+                        least_used_workers.append(worker)
+
+        return least_used_workers
+
     def make_schedule(self):
         days = self.worker_manager.get_days()
         time_frames = self._get_time_frames_list()
