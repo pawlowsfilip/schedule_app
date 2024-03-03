@@ -124,6 +124,20 @@ class Scheduler_r(Scheduler):
 
         return least_used_workers
 
+    def _get_previous_time_frame_worker(self, current_day, current_time_frame):
+        sorted_time_frames = self._get_time_frames_list()  # This needs to return time frames in sorted order
+        current_index = sorted_time_frames.index(current_time_frame)
+
+        if current_index > 0:
+            previous_time_frame = sorted_time_frames[current_index - 1]
+            previous_workers = self.schedule.get(current_day, {}).get(previous_time_frame, [])
+
+            for worker in previous_workers:
+                if worker.is_available(current_day, current_time_frame):
+                    return worker
+
+        return None
+
     def make_schedule(self):
         days = self.worker_manager.get_days()
         time_frames = self._get_time_frames_list()
