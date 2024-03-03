@@ -31,7 +31,7 @@ class Worker:
             required_end = self._str_to_time(required_end_str)
 
             for worker_start, worker_end in day_availability:
-                if self._is_overlap(worker_start, worker_end, required_start, required_end):
+                if self._is_fully_covered(worker_start, worker_end, required_start, required_end):
                     return True
             return False
         else:
@@ -45,7 +45,7 @@ class Worker:
             required_end = self._str_to_time(required_end_str)
 
             for worker_start, worker_end in day_availability:
-                if self._is_overlap(worker_start, worker_end, required_start, required_end):
+                if self._is_fully_covered(worker_start, worker_end, required_start, required_end):
                     return True
             return False
         else:
@@ -56,9 +56,8 @@ class Worker:
         return datetime.strptime(time_str, "%H:%M").time()
 
     @staticmethod
-    def _is_overlap(worker_start, worker_end, required_start, required_end):
-        return ((worker_start <= required_start < worker_end) or
-                (required_start <= worker_start < required_end))
+    def _is_fully_covered(worker_start, worker_end, required_start, required_end):
+        return worker_start <= required_start and worker_end >= required_end
 
     @staticmethod
     def _time_frame_split(time_frame):
@@ -70,6 +69,9 @@ class Worker:
         return start, end
 
     def _process_availability(self, availability_str):
+        if not availability_str:
+            return []
+
         scopes = availability_str.split(',')
         time_tuples = []
 
