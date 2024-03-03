@@ -71,7 +71,7 @@ class Scheduler_s(Scheduler):
         least_usage = float('inf')
         least_used_workers = []
 
-        for day, day_schedule  in self.schedule.items():
+        for day, day_schedule in self.schedule.items():
             for time_frame_dict in day_schedule:
                 for time_frame, workers in time_frame_dict.items():
                     for worker in workers:
@@ -108,13 +108,20 @@ class Scheduler_s(Scheduler):
                             previous_worker not in workers_for_time_frame:
                         workers_for_time_frame.append(previous_worker)
 
-                    # 2. Try to get worker by normal availability
+                    # 2. Try to get least used worker
+                    least_used_workers = self._get_least_used_workers()
+                    for worker in least_used_workers:
+                        if len(workers_for_time_frame) < needed_workers and worker not in workers_for_time_frame \
+                                and worker.is_available(day, time_frame):
+                            workers_for_time_frame.append(worker)
+
+                    # 3. Try to get worker by normal availability
                     available_workers = self.worker_manager.get_available_workers(day, time_frame)
                     for worker in available_workers:
                         if len(workers_for_time_frame) < needed_workers and worker not in workers_for_time_frame:
                             workers_for_time_frame.append(worker)
 
-                    # 3. Try to worker by worse availability
+                    # 4. Try to worker by worse availability
                     if len(workers_for_time_frame) < needed_workers:
                         available_if_needed_workers = self.worker_manager.get_available_workers_if_needed(day,
                                                                                                           time_frame)
