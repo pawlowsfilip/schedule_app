@@ -30,6 +30,29 @@ def test_init_with_all_arguments_but_worker_unavailable():
     assert worker.get_position() == 'Manager'
 
 
+def test_get_name():
+    worker = Worker(name='John Doe', availability={'21.07': '8:00-10:00'}, worse_availability={'21.07': '10:00-14:00'},
+                    position='Manager')
+    assert worker.get_name() == "John Doe"
+
+
+def test_get_position():
+    worker = Worker(name='John Doe', availability={'21.07': '8:00-10:00'}, worse_availability={'21.07': '10:00-14:00'},
+                    position='Manager')
+    assert worker.get_position() == "Manager"
+
+
+def test_get_availability():
+    worker = Worker(name='John Doe', availability={'21.07': '8:00-10:00'}, worse_availability={'21.07': '10:00-14:00'},
+                    position='Manager')
+    assert worker.get_availability() == {'21.07': '8:00-10:00'}
+
+
+def test_get_worse_availability():
+    worker = Worker(name='John Doe', availability={'21.07': '8:00-10:00'}, worse_availability={'21.07': '10:00-14:00'},
+                    position='Manager')
+    assert worker.get_worse_availability() == {'21.07': '10:00-14:00'}
+
 # _is_available tests____________________________
 @pytest.mark.parametrize("availability, required_day, required_time, expected",[
     ({"21.07": "8:00-10:00"}, "21.07", "8:00-9:00", True),  # Available for entire timeframe

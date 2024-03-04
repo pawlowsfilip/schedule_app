@@ -9,7 +9,8 @@ class Worker_Manager:
     def __str__(self):
         worker_info = ""
         for worker in self.workers_list:
-            worker_info += f"Name: {worker.name}, Position: {worker.position}, Availability: {worker._availability}, Worse availability: {worker._worse_availability}\n"
+            worker_info += f"Name: {worker.name}, Position: {worker.position}, Availability: " \
+                           f"{worker._availability}, Worse availability: {worker._worse_availability}\n"
         return worker_info
 
     @staticmethod
@@ -59,9 +60,13 @@ class Worker_Manager:
         """
         Returns workers sorted by their position priority.
         Workers without a defined position are treated as the lowest priority.
+        Higher numbers to lower-priority positions.
         """
-        # Sort workers based on the position priority, then by name or another attribute for consistency.
-        return sorted(self.workers_list, key=lambda worker: self._get_position_priority(worker.position), reverse=True)
+        if self.position_priorities:
+            # Sort workers based on the position priority, then by name or another attribute for consistency.
+            return sorted(self.workers_list, key=lambda worker: self._get_position_priority(worker.position))
+        else:
+            pass
 
     def get_available_workers(self, day, time_frame):
         available_workers = []
