@@ -14,3 +14,7 @@ To get started with the Scheduler, follow these steps:
 
 1. **Clone the Repository**
    TBD
+
+
+## IMPORTANT
+get_available works only if the worker is available through WHOLE time frame
