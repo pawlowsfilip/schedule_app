@@ -155,7 +155,8 @@ class Scheduler_r(Scheduler):
                 # 1. Sort workers based on the priorities
                 sorted_workers = self.worker_manager.get_sorted_workers_by_position_priority()
 
-                for worker in sorted_workers:
+                # Reverse the order, because the higher value, the lower position worker has.
+                for worker in sorted_workers[::-1]:
                     # Skip if the time frame already has the needed workers
                     if len(self.schedule[day][time_frame]) >= needed_workers:
                         break
