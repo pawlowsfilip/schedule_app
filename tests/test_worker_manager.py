@@ -20,6 +20,7 @@ def test_init_with_workers():
     assert wm.workers_list[1].name == "Doe John"
 
 
+# make_workers tests__________________________________
 def test_make_workers():
     w1 = Worker("John Doe", {'21.07': '9:00-17:00'})
     w2 = Worker("Doe John", {'22.07': '9:00-17:00'})
@@ -38,6 +39,7 @@ def test_make_workers_custom_input(mock_input):
     assert workers_list[0]._worse_availability == {'21.07': '18:00-12:00'}
 
 
+# set_position_priorities tests_______________________
 def test_set_position_priorities_correctly():
     w1 = Worker("John Doe", {'21.07': '9:00-17:00'})
     wm = Worker_Manager(w1)
@@ -67,6 +69,7 @@ def test_set_position_priorities_updated_correctly():
     assert wm.position_priorities == updated_priorities
 
 
+# get_sorted_workers_by_position_priority tests_______
 def test_get_sorted_workers_by_position_priority_correctly():
     w1 = Worker("John Doe", {'21.07': '9:00-17:00'}, position="Manager")
     w2 = Worker("Doe John", {'22.07': '9:00-17:00'}, position="CEO")
@@ -85,6 +88,7 @@ def test_get_sorted_workers_by_position_priority_without_positions():
     assert wm.get_sorted_workers_by_position_priority() == [w1, w2]
 
 
+# get_available_workers tests_________________________
 def test_get_available_workers_one_worker_available():
     w1 = Worker("John Doe", {'21.07': '8:00-9:00'})
     w2 = Worker("Doe John", {'22.07': '10:00-15:00'})
@@ -155,6 +159,7 @@ def test_get_available_workers_available_for_multiple_days():
     assert wm.get_available_workers(day2, time_frame) == [w1]
 
 
+# remove_worker tests_________________________________
 def test_remove_worker_correctly_one_worker():
     w1 = Worker("John Doe", {'21.07': '8:00-9:00', '22.07': '8:00-9:00'})
     wm = Worker_Manager(w1)
@@ -170,6 +175,7 @@ def test_remove_worker_correctly_two_workers():
     assert wm.remove_worker(w1) is True and len(wm.workers_list) == 1
 
 
+# get_days tests______________________________________
 def test_get_days_correctly_from_one_day():
     w1 = Worker("John Doe", {'21.07': '8:00-9:00'})
     wm = Worker_Manager(w1)
@@ -191,6 +197,7 @@ def test_get_days_correctly_from_no_availability():
     assert wm.get_days() == w1._availability.keys()
 
 
+# get_hours tests_____________________________________
 def test_get_hours_for_specific_day_single_worker():
     w1 = Worker("John Doe", {'21.07': '8:00-9:00'})
     wm = Worker_Manager(w1)

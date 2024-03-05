@@ -12,12 +12,10 @@ class Scheduler_r(Scheduler):
         variant (str): Variant identifier for the scheduling algorithm.
     """
 
-    def __init__(self, accuracy, allocation, variant):
+    def __init__(self, variant: str, accuracy=None, allocation=None) -> None:
         super().__init__(variant)
-
         self.accuracy = accuracy
-        self.allocation = allocation  # {"7:00-10:00": 1, ...}
-        self.variant = variant
+        self.allocation = allocation
         self.schedule = {}
 
     def _get_working_hours(self):
