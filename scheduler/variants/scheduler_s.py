@@ -8,9 +8,8 @@ class Scheduler_s(Scheduler):
 
     """
 
-    def __init__(self, time_frames: dict, variant: str, start=None, end=None) -> None:
+    def __init__(self, variant: str, time_frames=None, start=None, end=None) -> None:
         super().__init__(variant)
-
         self.time_frames = time_frames
         self.start = start
         self.end = end
