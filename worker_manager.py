@@ -19,20 +19,6 @@ class Worker_Manager:
 
         if workers:
             workers_list.extend(workers)
-
-        else:
-            while True:
-                name = input("Enter workers name (or type 'exit' to finish): ")
-                if name.lower() == 'exit':
-                    return workers_list
-
-                position = input("Enter worker's position: ")
-                availability = input("Enter worker's availability: ")
-                worse_availability = input("Enter worker's worse availability: ")
-
-                worker = Worker(name, availability, worse_availability, position)
-
-                workers_list.append(worker)
         return workers_list
 
     def set_position_priorities(self, priorities):

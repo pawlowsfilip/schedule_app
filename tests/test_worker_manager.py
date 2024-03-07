@@ -28,17 +28,6 @@ def test_make_workers():
     assert wm.make_workers(w1, w2) == [w1, w2]
 
 
-@patch('builtins.input', side_effect=['John Doe', 'Manager', {'21.07': '9:00-17:00'}, {'21.07': '18:00-12:00'}, 'exit'])
-def test_make_workers_custom_input(mock_input):
-    workers_list = Worker_Manager.make_workers()
-    assert len(workers_list) == 1
-    assert isinstance(workers_list[0], Worker)
-    assert workers_list[0].name == "John Doe"
-    assert workers_list[0].position == "Manager"
-    assert workers_list[0].availability == {'21.07': '9:00-17:00'}
-    assert workers_list[0]._worse_availability == {'21.07': '18:00-12:00'}
-
-
 # set_position_priorities tests_______________________
 def test_set_position_priorities_correctly():
     w1 = Worker("John Doe", {'21.07': '9:00-17:00'})
