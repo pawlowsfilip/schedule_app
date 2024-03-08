@@ -56,33 +56,39 @@ class Scheduler_r(Scheduler):
             int: The number of time frames per day.
         """
         start, end = self._get_working_hours()
-        # having the strptime because it is easier to subtract end from start
-        start_time = datetime.strptime(start, '%H:%M')
-        end_time = datetime.strptime(end, '%H:%M')
+        if start and end:
+            # having the strptime because it is easier to subtract end from start
+            start_time = datetime.strptime(start, '%H:%M')
+            end_time = datetime.strptime(end, '%H:%M')
 
-        # calculate the time frame in minutes
-        total_time = (end_time - start_time).total_seconds() / 60
-        time_frame_duration = int(self.accuracy * 60)
+            # calculate the time frame in minutes
+            total_time = (end_time - start_time).total_seconds() / 60
+            time_frame_duration = int(self.accuracy * 60)
 
-        return int(total_time / time_frame_duration)
+            return int(total_time / time_frame_duration)
+        else:
+            return None
 
     def _get_time_frames_list(self):
         start, end = self._get_working_hours()
-        start_time = datetime.strptime(start, '%H:%M')
-        end_time = datetime.strptime(end, '%H:%M')
-        accuracy_minutes = int(self.accuracy * 60)
-        time_frames = []
+        if start and end:
+            start_time = datetime.strptime(start, '%H:%M')
+            end_time = datetime.strptime(end, '%H:%M')
+            accuracy_minutes = int(self.accuracy * 60)
+            time_frames = []
 
-        current_time = start_time
+            current_time = start_time
 
-        while current_time < end_time:
-            next_time = current_time + timedelta(minutes=accuracy_minutes)
-            next_time = min(next_time, end_time)
-            time_frame_str = f"{current_time.strftime('%H:%M')}-{next_time.strftime('%H:%M')}"
-            time_frames.append(time_frame_str)
-            current_time = next_time
+            while current_time < end_time:
+                next_time = current_time + timedelta(minutes=accuracy_minutes)
+                next_time = min(next_time, end_time)
+                time_frame_str = f"{current_time.strftime('%H:%M')}-{next_time.strftime('%H:%M')}"
+                time_frames.append(time_frame_str)
+                current_time = next_time
 
-        return time_frames
+            return time_frames
+        else:
+            return None
 
     def get_needed_workers_for_time_frame(self, current_time_frame):
         current_start_str, current_end_str = current_time_frame.split('-')
