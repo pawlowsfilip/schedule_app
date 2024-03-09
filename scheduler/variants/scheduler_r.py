@@ -91,17 +91,20 @@ class Scheduler_r(Scheduler):
             return None
 
     def get_needed_workers_for_time_frame(self, current_time_frame):
-        current_start_str, current_end_str = current_time_frame.split('-')
-        current_start = self._parse_time(current_start_str)
-        current_end = self._parse_time(current_end_str)
+        if not current_time_frame:
+            return None
+        else:
+            current_start_str, current_end_str = current_time_frame.split('-')
+            current_start = self._parse_time(current_start_str)
+            current_end = self._parse_time(current_end_str)
 
-        for time_range, workers_needed in self.allocation.items():
-            start_str, end_str = time_range.split('-')
-            start_time = self._parse_time(start_str)
-            end_time = self._parse_time(end_str)
+            for time_range, workers_needed in self.allocation.items():
+                start_str, end_str = time_range.split('-')
+                start_time = self._parse_time(start_str)
+                end_time = self._parse_time(end_str)
 
-            if (start_time <= current_start < end_time) or (start_time < current_end <= end_time):
-                return workers_needed
+                if (start_time <= current_start < end_time) or (start_time < current_end <= end_time):
+                    return workers_needed
 
     def _get_least_used_workers(self):
         """
@@ -115,16 +118,17 @@ class Scheduler_r(Scheduler):
         least_usage = float('inf')
         least_used_workers = []
 
-        for day, day_info in self.schedule.items():
-            for timestamp, workers in day_info.items():
+        # Count usage for each worker
+        for day_info in self.schedule.values():
+            for workers in day_info.values():
                 for worker in workers:
-                    count = worker_counts.get(worker, 0) + 1
-                    worker_counts[worker] = count
+                    worker_counts[worker] = worker_counts.get(worker, 0) + 1
+                    least_usage = min(least_usage, worker_counts[worker])
 
-                    if count <= least_usage:
-                        least_usage = count
-                    if count == least_usage:
-                        least_used_workers.append(worker)
+        # Find all workers with the least usage
+        for worker, count in worker_counts.items():
+            if count == least_usage:
+                least_used_workers.append(worker)
 
         return least_used_workers
 

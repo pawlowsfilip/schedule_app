@@ -53,6 +53,7 @@ def test_number_of_time_frames_per_day_one_time_frame_quarter_hour_accuracy():
     assert scheduler._number_of_time_frames_per_day() == 4
 
 
+# _get_time_frames_list ______________________________
 def test_get_time_frames_list_no_allocation():
     scheduler = Scheduler_r("R", accuracy=1.0, allocation={})
     assert scheduler._get_time_frames_list() is None
@@ -83,6 +84,30 @@ def test_get_time_frames_list_two_hours_allocation_half_hour_accuracy_multiple_t
     assert scheduler._get_time_frames_list() == ["07:00-07:30", "07:30-08:00", "08:00-08:30", "08:30-09:00"]
 
 
-"""
-TBD
-"""
+# get_needed_workers_for_time_frame __________________
+@pytest.mark.parametrize("time_frame, expected_workers",[
+    ("9:00-13:00", 2),
+    ("10:00-11:00", 2),
+    ("9:00-12:00", 2),
+    ("13:00-14:00", 3),
+    ("15:00-16:00", None),
+    ("13:00-15:00", 3),
+    (None, None),
+])
+def test_get_needed_workers_for_time_frame_empty_time_frame(time_frame, expected_workers):
+    scheduler = Scheduler_r("R", accuracy=1.0, allocation={"9:00-13:00": 2, "13:00-15:00": 3})
+    assert scheduler.get_needed_workers_for_time_frame(time_frame) == expected_workers
+
+
+def test_get_least_used_workers_no_workers(scheduler_r_instance):
+    assert scheduler_r_instance._get_least_used_workers() == []
+
+
+def test_get_least_used_workers_equal_usage(scheduler_r_instance):
+    scheduler_r_instance.schedule = {"21.07":  {"7:00-8:00": ["Filip"], "8:00-9:00": ["Filip"], "9:00-10:00": ["Filip"],
+                                                "10:00-11:00": ["Konrad"], "11:00-12:00": ["Konrad"],
+                                                "12:00-13:00": ["Konrad"], "13:00-14:00": ["Ola"]}}
+    least_use_workers = scheduler_r_instance._get_least_used_workers()
+    assert "Ola" in least_use_workers
+    assert len(least_use_workers) == 1
+
