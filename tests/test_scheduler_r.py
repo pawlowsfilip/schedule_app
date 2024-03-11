@@ -1,5 +1,7 @@
 import pytest
 from scheduler.variants.scheduler_r import Scheduler_r
+from unittest.mock import patch, MagicMock
+
 
 
 @pytest.fixture()
@@ -85,7 +87,7 @@ def test_get_time_frames_list_two_hours_allocation_half_hour_accuracy_multiple_t
 
 
 # get_needed_workers_for_time_frame __________________
-@pytest.mark.parametrize("time_frame, expected_workers",[
+@pytest.mark.parametrize("time_frame, expected_workers", [
     ("9:00-13:00", 2),
     ("10:00-11:00", 2),
     ("9:00-12:00", 2),
@@ -103,11 +105,57 @@ def test_get_least_used_workers_no_workers(scheduler_r_instance):
     assert scheduler_r_instance._get_least_used_workers() == []
 
 
-def test_get_least_used_workers_equal_usage(scheduler_r_instance):
-    scheduler_r_instance.schedule = {"21.07":  {"7:00-8:00": ["Filip"], "8:00-9:00": ["Filip"], "9:00-10:00": ["Filip"],
-                                                "10:00-11:00": ["Konrad"], "11:00-12:00": ["Konrad"],
-                                                "12:00-13:00": ["Konrad"], "13:00-14:00": ["Ola"]}}
+def test_get_least_used_workers_one_worker(scheduler_r_instance):
+    scheduler_r_instance.schedule = {"21.07": {"7:00-8:00": ["Filip"], "8:00-9:00": ["Filip"], "9:00-10:00": ["Filip"],
+                                               "10:00-11:00": ["Konrad"], "11:00-12:00": ["Konrad"],
+                                               "12:00-13:00": ["Konrad"], "13:00-14:00": ["Ola"]}}
     least_use_workers = scheduler_r_instance._get_least_used_workers()
-    assert "Ola" in least_use_workers
+    assert "Ola" in least_use_workers and "Konrad" not in least_use_workers and "Filip" not in least_use_workers
     assert len(least_use_workers) == 1
 
+
+def test_get_least_used_workers_equal_usage(scheduler_r_instance):
+    scheduler_r_instance.schedule = {"21.07": {"7:00-8:00": ["Filip"], "8:00-9:00": ["Filip"], "9:00-10:00": ["Filip"],
+                                               "10:00-11:00": ["Konrad"], "11:00-12:00": ["Konrad"],
+                                               "12:00-13:00": ["Konrad"]}}
+    least_use_workers = scheduler_r_instance._get_least_used_workers()
+    assert "Konrad" not in least_use_workers and "Filip" not in least_use_workers
+    assert len(least_use_workers) == 0
+
+
+def test_get_least_used_workers_two_workers_different_days(scheduler_r_instance):
+    scheduler_r_instance.schedule = {"21.07": {"7:00-8:00": ["Filip"], "8:00-9:00": ["Filip"], "9:00-10:00": ["Filip"],
+                                               "10:00-11:00": ["Konrad"], "11:00-12:00": ["Konrad"],
+                                               "12:00-13:00": ["Konrad"], "13:00-14:00": ["Ola"]},
+                                     "22.07": {"7:00-8:00": ["Filip"], "8:00-9:00": ["Filip"], "9:00-10:00": ["Filip"],
+                                               "10:00-11:00": ["Konrad"], "11:00-12:00": ["Konrad"],
+                                               "12:00-13:00": ["Konrad"], "13:00-14:00": ["Natalia"]}}
+    least_use_workers = scheduler_r_instance._get_least_used_workers()
+    assert "Ola" in least_use_workers and "Natalia" in least_use_workers and "Konrad" not in least_use_workers \
+           and "Filip" not in least_use_workers
+    assert len(least_use_workers) == 2
+
+
+def test_get_previous_time_frame_worker_with_available_workers(scheduler_r_instance):
+    mock_worker = MagicMock()
+    mock_worker.name = "Filip"
+    mock_worker.is_available.return_value = True
+    scheduler_r_instance.schedule = {"21.07": {"7:00-8:00": [mock_worker], "8:00-9:00": [mock_worker],
+                                               "9:00-10:00": ["Filip"], "10:00-11:00": ["Konrad"],
+                                               "11:00-12:00": ["Konrad"], "12:00-13:00": ["Konrad"],
+                                               "13:00-14:00": ["Ola"]}}
+
+    with patch.object(scheduler_r_instance, '_get_time_frames_list', return_value=["7:00-8:00", "8:00-9:00",
+                                                                                   "9:00-10:00", "10:00-11:00",
+                                                                                   "11:00-12:00", "12:00-13:00",
+                                                                                   "13:00-14:00"]):
+        current_day = "21.07"
+        current_time_frame = "8:00-9:00"
+        previous_time_frame_worker = scheduler_r_instance._get_previous_time_frame_worker(current_day,
+                                                                                          current_time_frame)
+        assert previous_time_frame_worker == mock_worker
+
+
+"""
+TBD
+"""

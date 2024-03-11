@@ -143,7 +143,6 @@ class Scheduler_r(Scheduler):
             for worker in previous_workers:
                 if worker.is_available(current_day, current_time_frame):
                     return worker
-
         return None
 
     def make_schedule(self):
