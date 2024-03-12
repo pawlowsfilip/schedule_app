@@ -1,10 +1,11 @@
 import pytest
 from scheduler.variants.scheduler_r import Scheduler_r
 from unittest.mock import patch, MagicMock
+from worker_manager import Worker_Manager
+from worker import Worker
 
 
-
-@pytest.fixture()
+@pytest.fixture
 def scheduler_r_instance():
     accuracy = 1
     allocation = {"7:00-10:00": 1, "10:00-14:00": 2}
@@ -196,3 +197,55 @@ def test_get_previous_time_frame_worker_with_no_previous_time_frame(scheduler_r_
         assert previous_time_frame_worker is None
 
 
+# make_schedule() ____________________________________
+@pytest.fixture
+def scheduler_r_no_worker_needed():
+    accuracy = 1
+    allocation = {"7:00-10:00": 0}
+    scheduler = Scheduler_r("R", accuracy=accuracy, allocation=allocation)
+
+    scheduler.worker_manager = MagicMock()
+    scheduler.worker_manager.get_days.return_value = ['21.07']
+
+    return scheduler
+
+
+def test_make_schedule_no_workers_needed(scheduler_r_no_worker_needed):
+    schedule = scheduler_r_no_worker_needed.make_schedule()
+    assert schedule.get('21.07', {}).get("9:00-10:00") is None
+
+
+@pytest.fixture
+def mock_worker_manager_one_available_worker():
+    worker = MagicMock(spec=Worker, name='Filip')
+    worker.name = 'Filip'
+
+    worker_manager = MagicMock(spec=Worker_Manager)
+    worker_manager.get_days.return_value = ['21.07']
+    worker_manager.get_sorted_workers_by_position_priority.return_value = [worker]
+    worker_manager.get_available_workers.return_value = [worker]
+    worker_manager.get_available_workers_if_needed = []
+
+    return worker_manager
+
+
+@pytest.fixture
+def scheduler_r_one_worker_needed_for_one_time_frame(mock_worker_manager_one_available_worker):
+    accuracy = 1
+    allocation = {"7:00-8:00": 1}
+    scheduler = Scheduler_r("R", accuracy=accuracy, allocation=allocation)
+    scheduler.worker_manager = mock_worker_manager_one_available_worker
+    return scheduler
+
+
+def test_make_schedule_one_worker_needed_one_worker_available(scheduler_r_one_worker_needed_for_one_time_frame):
+    schedule = scheduler_r_one_worker_needed_for_one_time_frame.make_schedule()
+    assert '21.07' in schedule
+    assert '07:00-08:00' in schedule['21.07']
+    assert len(schedule['21.07']['07:00-08:00']) == 1
+    assert schedule['21.07']['07:00-08:00'][0].name == "Filip"
+
+
+"""
+Write other possible test cases
+"""
