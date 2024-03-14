@@ -25,7 +25,7 @@ class Worker_Manager:
         """
         Dynamically sets or updates the priorities of positions.
         The priorities parameter should be a dictionary mapping position names to their priorities.
-        Lower numbers indicate higher priority.
+        Lower numbers indicate higher priority (first to assign to time_frame).
 
         :param priorities: Dict[str, int]
         """
