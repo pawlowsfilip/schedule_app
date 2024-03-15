@@ -461,23 +461,27 @@ def test_make_schedule_two_workers_normal_availability_previous_is_re_utilized(
     assert schedule['21.07']['08:00-09:00'][0].name == "Konrad"
 
 
-# # Least used worker is prioritized if previous not available ___________________
+# Least used worker is prioritized if previous not available ___________________
 # @pytest.fixture
 # def mock_worker_manager_three_workers_one_least_used_worker():
 #     worker1 = MagicMock(spec=Worker, name='Filip')
 #     worker1.name = 'Filip'
 #     worker1.position = 'Student'
-#     worker1._availability = {"11:00-12:00"}
+#     worker1.is_available.side_effect = lambda day, time_frame: time_frame in ["11:00-12:00"]
+#     worker1.is_available_if_needed.return_value = False
 #
 #     worker2 = MagicMock(spec=Worker, name='Konrad')
 #     worker2.name = 'Konrad'
 #     worker2.position = 'Student'
-#     worker2._availability = {"7:00-8:00,9:00-10:00,11:00-12:00"}
+#     worker2.is_available.side_effect = lambda day, time_frame: time_frame in ["07:00-08:00", "09:00-10:00",
+#                                                                               "11:00-12:00"]
+#     worker2.is_available_if_needed.return_value = False
 #
 #     worker3 = MagicMock(spec=Worker, name='Natalia')
 #     worker3.name = 'Natalia'
 #     worker3.position = 'Student'
-#     worker3._availability = {"8:00-9:00,10:00-11:00"}
+#     worker3.is_available.side_effect = lambda day, time_frame: time_frame in ["08:00-09:00", "10:00-11:00"]
+#     worker3.is_available_if_needed.return_value = False
 #
 #     worker_manager = MagicMock(spec=Worker_Manager)
 #     worker_manager.get_days.return_value = ['21.07']
@@ -490,7 +494,7 @@ def test_make_schedule_two_workers_normal_availability_previous_is_re_utilized(
 # def scheduler_r_three_workers_one_least_used_worker(
 #         mock_worker_manager_three_workers_one_least_used_worker):
 #     accuracy = 1
-#     allocation = {"7:00-8:00": 1, "8:00-9:00": 1, "9:00-10:00": 1, "10:00-11:00": 1, "11:00-12:00": 1}
+#     allocation = {"7:00-12:00": 1}
 #     scheduler = Scheduler_r("R", accuracy=accuracy, allocation=allocation)
 #     scheduler.worker_manager = mock_worker_manager_three_workers_one_least_used_worker
 #     return scheduler
@@ -514,5 +518,6 @@ def test_make_schedule_two_workers_normal_availability_previous_is_re_utilized(
 
 
 """
-TBD
+TBD - change the get least used workers - it should search through the all workers and compare it with the
+workers that are used and exclude them from the list.
 """
