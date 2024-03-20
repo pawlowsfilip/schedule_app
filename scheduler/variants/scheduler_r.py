@@ -114,23 +114,23 @@ class Scheduler_r(Scheduler):
             str or None: The name of a randomly selected worker with the least usage count,
                         or None if no workers are available.
         """
-        worker_counts = {}
-        least_usage = float('inf')
-        least_used_workers = []
+        worker_counts = {worker: 0 for worker in
+                         self.worker_manager.workers_list}  # Initialize all workers with zero usage
+        if worker_counts:
+            # Count usage for each worker
+            for day_info in self.schedule.values():
+                for workers in day_info.values():
+                    for worker in workers:
+                        if worker in worker_counts:
+                            worker_counts[worker] += 1
 
-        # Count usage for each worker
-        for day_info in self.schedule.values():
-            for workers in day_info.values():
-                for worker in workers:
-                    worker_counts[worker] = worker_counts.get(worker, 0) + 1
-                    least_usage = min(least_usage, worker_counts[worker])
+            # Get the worker with the minimum usage count
+            least_usage = min(worker_counts.values())
+            least_used_workers = [worker for worker, count in worker_counts.items() if count == least_usage]
 
-        # Find all workers with the least usage
-        for worker, count in worker_counts.items():
-            if count == least_usage:
-                least_used_workers.append(worker)
-
-        return least_used_workers
+            return least_used_workers[::-1]
+        else:
+            return []
 
     def _get_previous_time_frame_worker(self, current_day, current_time_frame):
         sorted_time_frames = self._get_time_frames_list()  # This needs to return time frames in sorted order
@@ -174,6 +174,9 @@ class Scheduler_r(Scheduler):
                         if worker not in self.schedule[day][time_frame]:
                             self.schedule[day][time_frame].append(worker)
                             continue
+                    # Skip if the time frame already has the needed workers
+                    if len(self.schedule[day][time_frame]) >= needed_workers:
+                        break
 
                     # 3. Check the least used worker on that position is still available
                     least_used_workers = self._get_least_used_workers()
@@ -183,16 +186,25 @@ class Scheduler_r(Scheduler):
                             if least_used_worker not in self.schedule[day][time_frame]:
                                 self.schedule[day][time_frame].append(least_used_worker)
                                 break
+                    # Skip if the time frame already has the needed workers
+                    if len(self.schedule[day][time_frame]) >= needed_workers:
+                        break
 
                     # 4. Check the available workers on that position
                     if worker.is_available(day, time_frame) and worker not in self.schedule[day][time_frame]:
                         self.schedule[day][time_frame].append(worker)
                         continue
+                    # Skip if the time frame already has the needed workers
+                    if len(self.schedule[day][time_frame]) >= needed_workers:
+                        break
 
                     # 5. Check the available if needed on that position.
                     if worker.is_available_if_needed(day, time_frame) and worker not in self.schedule[day][time_frame]:
                         self.schedule[day][time_frame].append(worker)
                         continue
+                    # Skip if the time frame already has the needed workers
+                    if len(self.schedule[day][time_frame]) >= needed_workers:
+                        break
 
         # Handle cases where not enough workers are available
         for day, day_schedule in self.schedule.items():
