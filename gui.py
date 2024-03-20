@@ -32,5 +32,4 @@ def print_schedule(schedule):
                 print("No workers available")  # This line handles the case if workers list is empty
 
 
-
 print_schedule(test_schedule)

@@ -65,6 +65,8 @@ def mock_worker_manager_one_worker_normal_availability():
     worker_manager.get_days.return_value = ['21.07']
     worker_manager.get_sorted_workers_by_position_priority.return_value = [worker1]
 
+    worker_manager.workers_list = [worker1]
+
     return worker_manager
 
 
@@ -99,6 +101,8 @@ def mock_worker_manager_one_worker_worse_availability():
     worker_manager = MagicMock(spec=Worker_Manager)
     worker_manager.get_days.return_value = ['21.07']
     worker_manager.get_sorted_workers_by_position_priority.return_value = [worker1]
+
+    worker_manager.workers_list = [worker1]
 
     return worker_manager
 
@@ -142,6 +146,8 @@ def mock_worker_manager_two_workers_normal_availability():
     worker_manager.get_days.return_value = ['21.07']
     worker_manager.get_sorted_workers_by_position_priority.return_value = [worker1, worker2]
 
+    worker_manager.workers_list = [worker1, worker2]
+
     return worker_manager
 
 
@@ -183,6 +189,8 @@ def mock_worker_manager_two_workers_two_workers_worse_availability():
     worker_manager = MagicMock(spec=Worker_Manager)
     worker_manager.get_days.return_value = ['21.07']
     worker_manager.get_sorted_workers_by_position_priority.return_value = [worker1, worker2]
+
+    worker_manager.workers_list = [worker1, worker2]
 
     return worker_manager
 
@@ -227,6 +235,8 @@ def mock_worker_manager_no_workers_normal_availability_and_worse():
     worker_manager.get_days.return_value = ['21.07']
     worker_manager.get_sorted_workers_by_position_priority.return_value = [worker1, worker2]
 
+    worker_manager.workers_list = [worker1, worker2]
+
     return worker_manager
 
 
@@ -270,6 +280,8 @@ def mock_worker_manager_two_workers_one_worker_normal_availability():
     worker_manager.get_days.return_value = ['21.07']
     worker_manager.get_sorted_workers_by_position_priority.return_value = [worker1, worker2]
 
+    worker_manager.workers_list = [worker1, worker2]
+
     return worker_manager
 
 
@@ -311,6 +323,8 @@ def mock_worker_manager_two_workers_one_worker_worse_availability():
     worker_manager = MagicMock(spec=Worker_Manager)
     worker_manager.get_days.return_value = ['21.07']
     worker_manager.get_sorted_workers_by_position_priority.return_value = [worker1, worker2]
+
+    worker_manager.workers_list = [worker1, worker2]
 
     return worker_manager
 
@@ -363,6 +377,7 @@ def mock_worker_manager_three_workers_normal_availability_sorted_priority():
     worker_manager.get_days.return_value = ['21.07']
     worker_manager.get_sorted_workers_by_position_priority.return_value = [worker1, worker3, worker2]
 
+    worker_manager.workers_list = [worker1, worker2, worker3]
     return worker_manager
 
 
@@ -413,6 +428,8 @@ def mock_worker_manager_three_workers_normal_availability_highest_unavailable_so
     worker_manager.get_days.return_value = ['21.07']
     worker_manager.get_sorted_workers_by_position_priority.return_value = [worker1, worker3, worker2]
 
+    worker_manager.workers_list = [worker1, worker2, worker3]
+
     return worker_manager
 
 
@@ -462,59 +479,61 @@ def test_make_schedule_two_workers_normal_availability_previous_is_re_utilized(
 
 
 # Least used worker is prioritized if previous not available ___________________
-# @pytest.fixture
-# def mock_worker_manager_three_workers_one_least_used_worker():
-#     worker1 = MagicMock(spec=Worker, name='Filip')
-#     worker1.name = 'Filip'
-#     worker1.position = 'Student'
-#     worker1.is_available.side_effect = lambda day, time_frame: time_frame in ["11:00-12:00"]
-#     worker1.is_available_if_needed.return_value = False
-#
-#     worker2 = MagicMock(spec=Worker, name='Konrad')
-#     worker2.name = 'Konrad'
-#     worker2.position = 'Student'
-#     worker2.is_available.side_effect = lambda day, time_frame: time_frame in ["07:00-08:00", "09:00-10:00",
-#                                                                               "11:00-12:00"]
-#     worker2.is_available_if_needed.return_value = False
-#
-#     worker3 = MagicMock(spec=Worker, name='Natalia')
-#     worker3.name = 'Natalia'
-#     worker3.position = 'Student'
-#     worker3.is_available.side_effect = lambda day, time_frame: time_frame in ["08:00-09:00", "10:00-11:00"]
-#     worker3.is_available_if_needed.return_value = False
-#
-#     worker_manager = MagicMock(spec=Worker_Manager)
-#     worker_manager.get_days.return_value = ['21.07']
-#     worker_manager.get_sorted_workers_by_position_priority.return_value = [worker1, worker2, worker3]
-#
-#     return worker_manager
-#
-#
-# @pytest.fixture
-# def scheduler_r_three_workers_one_least_used_worker(
-#         mock_worker_manager_three_workers_one_least_used_worker):
-#     accuracy = 1
-#     allocation = {"7:00-12:00": 1}
-#     scheduler = Scheduler_r("R", accuracy=accuracy, allocation=allocation)
-#     scheduler.worker_manager = mock_worker_manager_three_workers_one_least_used_worker
-#     return scheduler
-#
-#
-# def test_make_schedule_scheduler_r_three_workers_one_least_used_worker(
-#         scheduler_r_three_workers_one_least_used_worker):
-#     schedule = scheduler_r_three_workers_one_least_used_worker.make_schedule()
-#     assert '21.07' in schedule
-#     assert '07:00-08:00' in schedule['21.07']
-#     assert len(schedule['21.07']['07:00-08:00']) == 1
-#     assert len(schedule['21.07']['08:00-09:00']) == 1
-#     assert len(schedule['21.07']['09:00-10:00']) == 1
-#     assert len(schedule['21.07']['10:00-11:00']) == 1
-#     assert len(schedule['21.07']['11:00-12:00']) == 1
-#     assert schedule['21.07']['07:00-08:00'][0].name == "Konrad"
-#     assert schedule['21.07']['08:00-09:00'][0].name == "Natalia"
-#     assert schedule['21.07']['09:00-10:00'][0].name == "Konrad"
-#     assert schedule['21.07']['10:00-11:00'][0].name == "Natalia"
-#     assert schedule['21.07']['11:00-12:00'][0].name == "Filip"
+@pytest.fixture
+def mock_worker_manager_three_workers_one_least_used_worker():
+    worker1 = MagicMock(spec=Worker, name='Filip')
+    worker1.name = 'Filip'
+    worker1.position = 'Student'
+    worker1.is_available.side_effect = lambda day, time_frame: time_frame in ["11:00-12:00"]
+    worker1.is_available_if_needed.return_value = False
+
+    worker2 = MagicMock(spec=Worker, name='Konrad')
+    worker2.name = 'Konrad'
+    worker2.position = 'Student'
+    worker2.is_available.side_effect = lambda day, time_frame: time_frame in ["07:00-08:00", "09:00-10:00",
+                                                                              "11:00-12:00"]
+    worker2.is_available_if_needed.return_value = False
+
+    worker3 = MagicMock(spec=Worker, name='Natalia')
+    worker3.name = 'Natalia'
+    worker3.position = 'Student'
+    worker3.is_available.side_effect = lambda day, time_frame: time_frame in ["08:00-09:00", "10:00-11:00"]
+    worker3.is_available_if_needed.return_value = False
+
+    worker_manager = MagicMock(spec=Worker_Manager)
+    worker_manager.get_days.return_value = ['21.07']
+    worker_manager.get_sorted_workers_by_position_priority.return_value = [worker1, worker2, worker3]
+
+    worker_manager.workers_list = [worker1, worker2, worker3]
+
+    return worker_manager
+
+
+@pytest.fixture
+def scheduler_r_three_workers_one_least_used_worker(
+        mock_worker_manager_three_workers_one_least_used_worker):
+    accuracy = 1
+    allocation = {"7:00-12:00": 1}
+    scheduler = Scheduler_r("R", accuracy=accuracy, allocation=allocation)
+    scheduler.worker_manager = mock_worker_manager_three_workers_one_least_used_worker
+    return scheduler
+
+
+def test_make_schedule_scheduler_r_three_workers_one_least_used_worker(
+        scheduler_r_three_workers_one_least_used_worker):
+    schedule = scheduler_r_three_workers_one_least_used_worker.make_schedule()
+    assert '21.07' in schedule
+    assert '07:00-08:00' in schedule['21.07']
+    assert len(schedule['21.07']['07:00-08:00']) == 1
+    assert len(schedule['21.07']['08:00-09:00']) == 1
+    assert len(schedule['21.07']['09:00-10:00']) == 1
+    assert len(schedule['21.07']['10:00-11:00']) == 1
+    assert len(schedule['21.07']['11:00-12:00']) == 1
+    assert schedule['21.07']['07:00-08:00'][0].name == "Konrad"
+    assert schedule['21.07']['08:00-09:00'][0].name == "Natalia"
+    assert schedule['21.07']['09:00-10:00'][0].name == "Konrad"
+    assert schedule['21.07']['10:00-11:00'][0].name == "Natalia"
+    assert schedule['21.07']['11:00-12:00'][0].name == "Filip"
 
 
 """
