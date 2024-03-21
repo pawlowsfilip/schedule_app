@@ -27,7 +27,7 @@ make_schedule()
     │   └── Lower priority workers are assigned if higher are unavailable - DONE
     └── Checking for previous and least used workers
         ├── Previous time frame worker is re-utilized if available - DONE
-        ├── Least used worker is prioritized if previous not available
+        ├── Least used worker is prioritized if previous not available - DONE
         └── New worker is added if neither previous nor least used is suitable
 """
 

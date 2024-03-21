@@ -108,11 +108,11 @@ class Scheduler_r(Scheduler):
 
     def _get_least_used_workers(self):
         """
-        Identifies and returns a worker with the minimum usage count within the schedule.
+        Identifies and returns a list of workers with the minimum usage count within the schedule.
+        If all workers have the same usage count, returns an empty list because they are equally used.
 
         Returns:
-            str or None: The name of a randomly selected worker with the least usage count,
-                        or None if no workers are available.
+            list: A list of worker objects with the least usage count, or an empty list if no workers are available or all are equally used.
         """
         worker_counts = {worker: 0 for worker in
                          self.worker_manager.workers_list}  # Initialize all workers with zero usage
@@ -123,6 +123,10 @@ class Scheduler_r(Scheduler):
                     for worker in workers:
                         if worker in worker_counts:
                             worker_counts[worker] += 1
+
+            # Check if all workers are used equally
+            if len(set(worker_counts.values())) == 1:
+                return []
 
             # Get the worker with the minimum usage count
             least_usage = min(worker_counts.values())
