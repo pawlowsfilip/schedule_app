@@ -26,17 +26,20 @@ class Scheduler_s(Scheduler):
         return time_frames
 
     def get_needed_workers_for_time_frame(self, current_time_frame):
-        current_start_str, current_end_str = current_time_frame.split('-')
-        current_start = self._parse_time(current_start_str)
-        current_end = self._parse_time(current_end_str)
+        if current_time_frame:
+            current_start_str, current_end_str = current_time_frame.split('-')
+            current_start = self._parse_time(current_start_str)
+            current_end = self._parse_time(current_end_str)
 
-        for day, recesses in self.time_frames.items():
-            for recess in recesses:
-                start_time = self._parse_time(recess["start"])
-                end_time = self._parse_time(recess["end"])
+            for day, recesses in self.time_frames.items():
+                for recess in recesses:
+                    start_time = self._parse_time(recess["start"])
+                    end_time = self._parse_time(recess["end"])
 
-                if (start_time <= current_start < end_time) or (start_time < current_end <= end_time):
-                    return recess["allocation"]
+                    if (start_time <= current_start < end_time) or (start_time < current_end <= end_time):
+                        return recess["allocation"]
+        else:
+            return None
 
     def _get_previous_time_frame_worker(self, current_day, current_time_frame):
         sorted_time_frames = self._get_time_frames_list()  # This needs to return time frames in sorted order
@@ -44,18 +47,13 @@ class Scheduler_s(Scheduler):
 
         if current_index > 0:
             previous_time_frame = sorted_time_frames[current_index - 1]
-            day_schedule = self.schedule.get(current_day, [])
-            previous_workers = []
+            day_schedule = self.schedule.get(current_day, {})
 
-            for time_frame_dict in day_schedule:
-                if previous_time_frame in time_frame_dict:
-                    previous_workers = time_frame_dict[previous_time_frame]
-                    break
-
-            for worker in previous_workers:
-                if worker.is_available(current_day, current_time_frame):
-                    return worker
-
+            if previous_time_frame in day_schedule:
+                previous_workers = day_schedule[previous_time_frame]
+                for worker in previous_workers:
+                    if worker.is_available(current_day, current_time_frame):
+                        return worker
         return None
 
     def _get_least_used_workers(self):
