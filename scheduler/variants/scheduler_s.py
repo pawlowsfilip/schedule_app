@@ -45,6 +45,9 @@ class Scheduler_s(Scheduler):
         sorted_time_frames = self._get_time_frames_list()  # This needs to return time frames in sorted order
         current_index = sorted_time_frames.index(current_time_frame)
 
+        if current_time_frame not in sorted_time_frames:
+            raise ValueError(f"Time frame {current_time_frame} not found in schedule.")
+
         if current_index > 0:
             previous_time_frame = sorted_time_frames[current_index - 1]
             day_schedule = self.schedule.get(current_day, {})
@@ -64,23 +67,27 @@ class Scheduler_s(Scheduler):
             str or None: The name of a randomly selected worker with the least usage count,
                         or None if no workers are available.
         """
-        worker_counts = {}
-        least_usage = float('inf')
-        least_used_workers = []
+        worker_counts = {worker: 0 for worker in
+                         self.worker_manager.workers_list}  # Initialize all workers with zero usage
 
-        for day, day_schedule in self.schedule.items():
-            for time_frame_dict in day_schedule:
-                for time_frame, workers in time_frame_dict.items():
+        if worker_counts:
+            for day_schedule in self.schedule.values():
+                for workers in day_schedule.values():
                     for worker in workers:
-                        count = worker_counts.get(worker, 0) + 1
-                        worker_counts[worker] = count
+                        if worker in worker_counts:
+                            worker_counts[worker] += 1
 
-                        if count <= least_usage:
-                            least_usage = count
-                        if count == least_usage:
-                            least_used_workers.append(worker)
+            # Check if all workers are used equally
+            if len(set(worker_counts.values())) == 1:
+                return []
 
-        return least_used_workers
+            # Get the worker with the minimum usage count
+            least_usage = min(worker_counts.values())
+            least_used_workers = [worker for worker, count in worker_counts.items() if count == least_usage]
+
+            return least_used_workers[::-1]
+        else:
+            return []
 
     def make_schedule(self):
         days = self.worker_manager.get_days()

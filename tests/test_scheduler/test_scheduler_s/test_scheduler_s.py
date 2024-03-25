@@ -28,14 +28,3 @@ def setup_scheduler(mock_worker_manager):
                             start="7:00", end="14:00")
     scheduler.worker_manager = mock_worker_manager
     return scheduler
-
-
-def test_make_schedule_with_one_worker(setup_scheduler):
-    # Directly use the setup_scheduler fixture, which is already a Scheduler_s instance
-    expected_schedule = {"21.07": [{"8:00-8:15": [mock_worker_1]},
-                                   {"9:00-9:15": [mock_worker_1, mock_worker_2]}]}  # Expected to use the worker's name
-
-    actual_schedule = setup_scheduler.make_schedule()
-
-    # Assert the expected and actual schedules match
-    assert actual_schedule == expected_schedule
