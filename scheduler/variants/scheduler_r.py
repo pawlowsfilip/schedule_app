@@ -1,5 +1,7 @@
 from scheduler.scheduler import Scheduler
 from datetime import datetime, timedelta
+import pandas as pd
+
 
 
 class Scheduler_r(Scheduler):
@@ -217,3 +219,28 @@ class Scheduler_r(Scheduler):
                     workers.append("No worker available")
 
         return self.schedule
+
+def scheduler_to_pandas(schedule):
+    dates = []
+    time_frames = []
+    workers = []
+
+    for day, day_schedule in schedule.items():
+        for time_frame, workers_list in day_schedule.items():
+            for worker in workers_list:
+                dates.append(day)
+                time_frames.append(time_frame)
+                if isinstance(worker, str):
+                    workers.append(worker.name)
+                else:
+                    workers.append(worker)
+
+    df = pd.DataFrame({
+        "Date": dates,
+        "Time Frame": time_frames,
+        "Worker": workers
+    })
+
+    return df
+def export_to_csv(schedule, filename):
+    pass
