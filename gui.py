@@ -10,9 +10,15 @@ class Gui:
     def make_schedule(self):
         return self.scheduler.make_schedule()
 
+    def export_schedule(self):
+        self.scheduler.export_to_excel()
+
 
 test1 = Gui("R")
 test_schedule = test1.make_schedule()
+
+test1.export_schedule()
+
 print(test_schedule)
 
 

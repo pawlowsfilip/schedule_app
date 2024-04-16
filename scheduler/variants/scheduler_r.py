@@ -1,7 +1,7 @@
 from scheduler.scheduler import Scheduler
 from datetime import datetime, timedelta
 import pandas as pd
-
+import xlsxwriter
 
 
 class Scheduler_r(Scheduler):
@@ -220,27 +220,23 @@ class Scheduler_r(Scheduler):
 
         return self.schedule
 
-def scheduler_to_pandas(schedule):
-    dates = []
-    time_frames = []
-    workers = []
+    def schedule_to_dataframe(self):
+        data = []
+        for day, time_frames in self.schedule.items():
+            for time_frame, workers in time_frames.items():
+                worker_names = ', '.join([worker.name for worker in workers]) if workers else "No worker"
+                data.append({'Date': day, 'Time Frame': time_frame, 'Workers': worker_names})
+        return pd.DataFrame(data)
 
-    for day, day_schedule in schedule.items():
-        for time_frame, workers_list in day_schedule.items():
-            for worker in workers_list:
-                dates.append(day)
-                time_frames.append(time_frame)
-                if isinstance(worker, str):
-                    workers.append(worker.name)
-                else:
-                    workers.append(worker)
+    def pivot_schedule(self):
+        df = self.schedule_to_dataframe()
+        # Pivot the table
+        pivot_df = df.pivot(index='Time Frame', columns='Date', values='Workers')
+        pivot_df.reset_index(inplace=True)
+        pivot_df.columns.name = None  # Remove the hierarchy on the columns
+        return pivot_df
 
-    df = pd.DataFrame({
-        "Date": dates,
-        "Time Frame": time_frames,
-        "Worker": workers
-    })
-
-    return df
-def export_to_csv(schedule, filename):
-    pass
+    def export_to_excel(self, filename='schedule.xlsx'):
+        df = self.pivot_schedule()  # Use the pivoted DataFrame
+        with pd.ExcelWriter(filename, engine='xlsxwriter') as writer:
+            df.to_excel(writer, index=False, sheet_name='Schedule')
