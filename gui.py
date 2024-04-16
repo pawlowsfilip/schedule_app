@@ -1,6 +1,7 @@
 from scheduler import scheduler
 from scheduler_factory import SchedulerFactory
 from scheduler.variants.scheduler_r import Scheduler_r
+from excel_exporter import ExcelExporter
 
 
 class Gui:
@@ -11,7 +12,8 @@ class Gui:
         return self.scheduler.make_schedule()
 
     def export_schedule(self):
-        self.scheduler.export_to_excel()
+        schedule = self.make_schedule()
+        return ExcelExporter(schedule).export_to_excel()
 
 
 test1 = Gui("R")
