@@ -22,10 +22,10 @@ class ExcelExporter:
         pivot_df.columns.name = None  # Remove the hierarchy on the columns
         return pivot_df
 
-    def export_to_excel(self, filename='schedule.xlsx'):
+    def export_to_excel(self, filename='schedule_r.xlsx'):
         df = self.pivot_schedule()  # Use the pivoted DataFrame
         with pd.ExcelWriter(filename, engine='xlsxwriter') as writer:
-            df.to_excel(writer, index=False, sheet_name='Schedule', header=False)
+            df.to_excel(writer, index=False, sheet_name='Schedule')
 
             workbook = writer.book
             worksheet = writer.sheets['Schedule']
@@ -63,3 +63,5 @@ class ExcelExporter:
                 'type': 'no_errors',
                 'format': bold_border_format
             })
+
+            worksheet.autofit()

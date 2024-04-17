@@ -24,20 +24,20 @@ test1.export_schedule()
 print(test_schedule)
 
 
-def print_schedule(schedule):
-    for day, time_frames in schedule.items():
-        print(f"Schedule for {day}:")
-        for time_frame, workers in time_frames.items():
-            print(f"  Time Frame {time_frame}:")
-            if workers:  # Check if the list of workers is not empty
-                for worker in workers:
-                    # Check if worker is a string indicating no workers available or an actual Worker object
-                    if isinstance(worker, str) and worker == "No worker available":
-                        print(f"    {worker}")  # Print the string directly
-                    elif worker:  # This checks if worker is not None and not the "No worker available" string
-                        print(f"    Worker: {worker.name}, Position: {worker.position}")
-            else:
-                print("No workers available")  # This line handles the case if workers list is empty
-
-
-print_schedule(test_schedule)
+# def print_schedule(schedule):
+#     for day, time_frames in schedule.items():
+#         print(f"Schedule for {day}:")
+#         for time_frame, workers in time_frames.items():
+#             print(f"  Time Frame {time_frame}:")
+#             if workers:  # Check if the list of workers is not empty
+#                 for worker in workers:
+#                     # Check if worker is a string indicating no workers available or an actual Worker object
+#                     if isinstance(worker, str) and worker == "No worker available":
+#                         print(f"    {worker}")  # Print the string directly
+#                     elif worker:  # This checks if worker is not None and not the "No worker available" string
+#                         print(f"    Worker: {worker.name}, Position: {worker.position}")
+#             else:
+#                 print("No workers available")  # This line handles the case if workers list is empty
+#
+#
+# print_schedule(test_schedule)
