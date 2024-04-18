@@ -72,7 +72,7 @@ class Scheduler_s(Scheduler):
 
         if worker_counts:
             for day_schedule in self.schedule.values():
-                for workers in day_schedule.values():
+                for time_frame, workers in day_schedule.items():
                     for worker in workers:
                         if worker in worker_counts:
                             worker_counts[worker] += 1
@@ -95,14 +95,13 @@ class Scheduler_s(Scheduler):
         self.schedule = {day: [] for day in days}
 
         for day in days:
-            day_schedule = []  # This will hold all time frame dictionaries for the current day
+            day_schedule = {}  # This will hold all time frame dictionaries for the current day
 
             for time_frame in time_frames:
                 needed_workers = self.get_needed_workers_for_time_frame(time_frame)
                 workers_for_time_frame = []  # This will collect workers for the current time frame
 
                 if needed_workers == 0:
-                    day_schedule.append({time_frame: ["No worker needed"]})
                     continue
 
                 if len(workers_for_time_frame) < needed_workers:
@@ -136,7 +135,7 @@ class Scheduler_s(Scheduler):
                     while len(workers_for_time_frame) < needed_workers:
                         workers_for_time_frame.append("No worker available")
 
-                    day_schedule.append({time_frame: workers_for_time_frame})
+                    day_schedule[time_frame] = workers_for_time_frame
 
             self.schedule[day] = day_schedule
 
