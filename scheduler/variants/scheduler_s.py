@@ -71,6 +71,7 @@ class Scheduler_s(Scheduler):
                          self.worker_manager.workers_list}  # Initialize all workers with zero usage
 
         if worker_counts:
+            schedule = self.schedule
             for day_schedule in self.schedule.values():
                 for time_frame, workers in day_schedule.items():
                     for worker in workers:
@@ -92,7 +93,7 @@ class Scheduler_s(Scheduler):
     def make_schedule(self):
         days = self.worker_manager.get_days()
         time_frames = self._get_time_frames_list()
-        self.schedule = {day: [] for day in days}
+        self.schedule = {day: {} for day in days}
 
         for day in days:
             day_schedule = {}  # This will hold all time frame dictionaries for the current day
