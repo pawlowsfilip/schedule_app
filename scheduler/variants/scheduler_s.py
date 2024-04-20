@@ -55,8 +55,11 @@ class Scheduler_s(Scheduler):
             if previous_time_frame in day_schedule:
                 previous_workers = day_schedule[previous_time_frame]
                 for worker in previous_workers:
-                    if worker.is_available(current_day, current_time_frame):
-                        return worker
+                    if worker == 'No worker available':
+                        continue
+                    else:
+                        if worker.is_available(current_day, current_time_frame):
+                            return worker
         return None
 
     def _get_least_used_workers(self):
@@ -136,9 +139,9 @@ class Scheduler_s(Scheduler):
                     while len(workers_for_time_frame) < needed_workers:
                         workers_for_time_frame.append("No worker available")
 
-                    day_schedule[time_frame] = workers_for_time_frame
+                day_schedule[time_frame] = workers_for_time_frame
 
-            self.schedule[day] = day_schedule
+                self.schedule[day] = day_schedule
 
         return self.schedule
 
