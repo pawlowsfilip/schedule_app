@@ -74,7 +74,6 @@ class Scheduler_s(Scheduler):
                          self.worker_manager.workers_list}  # Initialize all workers with zero usage
 
         if worker_counts:
-            schedule = self.schedule
             for day_schedule in self.schedule.values():
                 for time_frame, workers in day_schedule.items():
                     for worker in workers:

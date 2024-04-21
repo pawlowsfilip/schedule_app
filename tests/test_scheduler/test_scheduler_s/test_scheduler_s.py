@@ -282,14 +282,14 @@ def test_make_schedule_needed_for_two_time_frames_not_re_utilized(
 #         worker for worker in [worker1, worker2, worker3] if worker.is_available(day, time_frame)
 #     ])
 #
-#     return worker_manager
+#     return worker_manager, worker1, worker2, worker3
 #
 #
 # @pytest.mark.parametrize(
 #     "available_workers,expected_schedule",
 #     [
 #         (
-#                 {'8:00-8:15': ['worker1'], '9:00-9:15': ['worker1', 'worker2'], '10:00-10:15': ['worker2'],
+#                 {'8:00-8:15': ['worker1'], '9:00-9:15': ['worker1'], '10:00-10:15': ['worker2'],
 #                  '11:00-11:15': ['worker2'], '12:00-12:15': ['worker1', 'worker3']},
 #                 {'21.07': {'8:00-8:15': ['worker1'], '9:00-9:15': ['worker1'], '10:00-10:15': ['worker2'],
 #                            '11:00-11:15': ['worker2'], '12:00-12:15': ['worker3']}}
@@ -303,7 +303,14 @@ def test_make_schedule_needed_for_two_time_frames_not_re_utilized(
 #                                                         {"start": "10:00", "end": "10:15", "allocation": 1},
 #                                                         {"start": "11:00", "end": "11:15", "allocation": 1},
 #                                                         {"start": "12:00", "end": "12:15", "allocation": 1}]})
-#     scheduler.worker_manager = mock_worker_manager_three_workers_least_used_worker
+#     scheduler.worker_manager, scheduler.worker1, scheduler.worker2, scheduler.worker3 = mock_worker_manager_three_workers_least_used_worker
+#     workers = {'worker1': scheduler.worker1, 'worker2': scheduler.worker2, 'worker3': scheduler.worker3}
+#
+#     # Adjust worker names to actual worker objects
+#     for time_frame, worker_names in available_workers.items():
+#         available_workers[time_frame] = [workers[worker_name] for worker_name in worker_names]
+#
+#     # scheduler.worker_manager = mock_worker_manager_three_workers_least_used_worker
 #     scheduler.worker_manager.get_available_workers = MagicMock(
 #         side_effect=lambda day, time_frame: available_workers.get(time_frame, []))
 #
