@@ -9,6 +9,7 @@ def dropdown_callback(value, app):
 class DefaultView(customtkinter.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
+        self.parent = parent
         self.pack(fill="both", expand=True)
 
         # Title Label
@@ -68,12 +69,4 @@ class DefaultView(customtkinter.CTkFrame):
         self.focus_set()
 
     def change_view(self, view_name):
-        # Remove all widgets in the window
-        for widget in self.winfo_children():
-            widget.destroy()
-
-        # Depending on the selection, load the appropriate view
-        if view_name == "Restaurant":
-            self.scheduler_r_view = SchedulerRView(self)
-        elif view_name == "School":
-            self.scheduler_s_view = SchedulerSView(self)
+        self.parent.change_view(view_name)

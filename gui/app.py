@@ -4,11 +4,6 @@ from gui.scheduler_s_view import SchedulerSView
 from gui.default_view import DefaultView
 
 
-def dropdown_callback(value, app):
-    print("Dropdown selected:", value)
-    app.change_view(value)
-
-
 class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
@@ -20,15 +15,17 @@ class App(customtkinter.CTk):
         self.current_view = DefaultView(self)  # Initialize the default view
 
     def change_view(self, view_name):
-        # Remove the current view
-        if self.current_view is not None:
-            self.current_view.destroy()
+        # Remove all widgets in the window
+        for widget in self.winfo_children():
+            widget.destroy()
 
         # Depending on the selection, load the appropriate view
-        if view_name == "Scheduler_R":
-            self.current_view = SchedulerRView(self)
-        elif view_name == "Scheduler_S":
-            self.current_view = SchedulerSView(self)
+        if view_name == "Restaurant":
+            self.scheduler_r_view = SchedulerRView(self)
+        elif view_name == "School":
+            self.scheduler_s_view = SchedulerSView(self)
+        elif view_name == "DefaultView":
+            self.default_view = DefaultView(self)
 
 
 app = App()

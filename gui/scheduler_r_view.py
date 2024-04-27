@@ -8,10 +8,29 @@ class SchedulerRView(customtkinter.CTkFrame):
 
     def __init__(self, parent):
         super().__init__(parent, fg_color='transparent')
+        self.parent = parent  # Store the reference to the parent
         self.pack(fill="both", expand=True)
         self.create_view()
 
+    def back_to_menu(self):
+        # Method to switch back to the default view
+        self.parent.change_view("DefaultView")  # Make sure the App class can handle this view name
+
+
     def create_view(self):
+        # back button
+        self.back_button = customtkinter.CTkButton(self, text="<",
+                                                   command=self.back_to_menu,
+                                                   width=50, height=50,
+                                                   fg_color="#242424",
+                                                   hover_color="#3e3e3e",
+                                                   border_color="#f2f2f2",
+                                                   border_width=2,
+                                                   text_color="#f2f2f2",
+                                                   font=("Inter", 20, "bold"),
+                                                   corner_radius=10)
+        self.back_button.place(relx=0.1, rely=0.1, anchor=customtkinter.CENTER)
+
         # Title Label
         self.title_label = customtkinter.CTkLabel(self, text="Restaurant",
                                                   font=("Inter", 90, "bold"),
