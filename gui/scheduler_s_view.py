@@ -1,14 +1,36 @@
 import customtkinter
+from PIL import Image
+from CTkToolTip import *
+
 
 class SchedulerSView(customtkinter.CTkFrame):
     """ Frame for the 'Scheduler_S' option within the main application window. """
 
-    def __init__(self, parent):
+    def __init__(self, parent, gui):
         super().__init__(parent, fg_color="transparent")
+        self.parent = parent
+        self.gui = gui
         self.pack(fill="both", expand=True)
         self.create_view()
 
+    def back_to_menu(self):
+        # Method to switch back to the default view
+        self.parent.change_view("DefaultView")  # Make sure the App class can handle this view name
+
     def create_view(self):
+        # back button
+        self.back_button = customtkinter.CTkButton(self, text="<",
+                                                   command=self.back_to_menu,
+                                                   width=50, height=50,
+                                                   fg_color="#242424",
+                                                   hover_color="#3e3e3e",
+                                                   border_color="#f2f2f2",
+                                                   border_width=2,
+                                                   text_color="#f2f2f2",
+                                                   font=("Inter", 20, "bold"),
+                                                   corner_radius=10)
+        self.back_button.place(relx=0.1, rely=0.1, anchor=customtkinter.CENTER)
+
         # Title Label
         self.title_label = customtkinter.CTkLabel(self, text="School",
                                                   font=("Inter", 90, "bold"),
@@ -31,13 +53,34 @@ class SchedulerSView(customtkinter.CTkFrame):
 
         # schedule_properties
         self.schedule_properties = customtkinter.CTkLabel(self.l_frame, text="Schedule properties",
-                                                          font=("Inter", 25, 'bold'),
+                                                          font=("Inter", 23, 'bold'),
                                                           fg_color="#333333",
                                                           text_color="#f2f2f2",
                                                           justify="left")
-        self.schedule_properties.place(relx=0.5,
+        self.schedule_properties.place(relx=0.47,
                                        rely=0.10,
                                        anchor=customtkinter.CENTER)
+
+        # info
+        self.info_icon = customtkinter.CTkImage(
+            light_image=Image.open(r"C:\Users\Filip\PycharmProjects\ScheduleApp\icons\info.png"),
+            size=(15, 15))
+
+        # Use the image in a label
+        self.info_label = customtkinter.CTkLabel(self.l_frame,
+                                                 text='',
+                                                 image=self.info_icon, )
+        self.info_label.place(relx=0.83, rely=0.103, anchor=customtkinter.CENTER)
+
+        tooltip = CTkToolTip(self.info_label, delay=0.5,
+                             message="Time frames are specific period of time\n"
+                                     "which needs to be filled by workers.\n"
+                                     "Ex. 8:00-8:15, 9:00-9:15, etc.",
+                             font=("Inter", 13),
+                             alpha=0.9,
+                             corner_radius=12,
+                             text_color='#f2f2f2',
+                             padding=(10, 10))
 
         # Time frames
         self.time_frames = customtkinter.CTkLabel(self.l_frame, text="Time frames",
@@ -81,6 +124,31 @@ class SchedulerSView(customtkinter.CTkFrame):
         self.worker.place(relx=0.275,
                           rely=0.10,
                           anchor=customtkinter.CENTER)
+
+        # info
+        self.info_icon = customtkinter.CTkImage(
+            light_image=Image.open(r"C:\Users\Filip\PycharmProjects\ScheduleApp\icons\info.png"),
+            size=(15, 15))
+
+        # Use the image in a label
+        self.info_label = customtkinter.CTkLabel(self.m_frame,
+                                                 text='',
+                                                 image=self.info_icon, )
+        self.info_label.place(relx=0.44, rely=0.104, anchor=customtkinter.CENTER)
+
+        tooltip = CTkToolTip(self.info_label, delay=0.5,
+                             message="Name is the name of the worker.\n\n"
+                                     "Availability is daily availability of the worker.\n"
+                                     'Ex. 21:07: [7:00-10:00, 14:00-15:00],\n22.07: [8:00-15:00]\n\n'
+                                     'Worse availability is daily availability of the worker,\n'
+                                     'but optional. If there is possibility to not come to work,\n'
+                                     'worker would rather not come.\n'
+                                     'Ex. 21:07: [7:00-10:00, 14:00-15:00],\n22.07: [8:00-15:00]',
+                             font=("Inter", 13),
+                             alpha=0.9,
+                             corner_radius=12,
+                             text_color='#f2f2f2',
+                             padding=(10, 10))
 
         # name
         self.name = customtkinter.CTkLabel(self.m_frame, text="Name",

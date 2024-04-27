@@ -6,12 +6,31 @@ from PIL import Image
 class SchedulerRView(customtkinter.CTkFrame):
     """ Frame for the 'Scheduler_R' option within the main application window. """
 
-    def __init__(self, parent):
+    def __init__(self, parent, gui):
         super().__init__(parent, fg_color='transparent')
+        self.parent = parent
+        self.gui = gui
         self.pack(fill="both", expand=True)
         self.create_view()
 
+    def back_to_menu(self):
+        # Method to switch back to the default view
+        self.parent.change_view("DefaultView")  # Make sure the App class can handle this view name
+
     def create_view(self):
+        # back button
+        self.back_button = customtkinter.CTkButton(self, text="<",
+                                                   command=self.back_to_menu,
+                                                   width=50, height=50,
+                                                   fg_color="#242424",
+                                                   hover_color="#3e3e3e",
+                                                   border_color="#f2f2f2",
+                                                   border_width=2,
+                                                   text_color="#f2f2f2",
+                                                   font=("Inter", 20, "bold"),
+                                                   corner_radius=10)
+        self.back_button.place(relx=0.1, rely=0.1, anchor=customtkinter.CENTER)
+
         # Title Label
         self.title_label = customtkinter.CTkLabel(self, text="Restaurant",
                                                   font=("Inter", 90, "bold"),
@@ -85,6 +104,7 @@ class SchedulerRView(customtkinter.CTkFrame):
         self.accuracy_entry.place(relx=0.5,
                                   rely=0.25,
                                   anchor=customtkinter.CENTER)
+        self.accuracy_entry.bind("<Return>", self.submit_accuracy)
 
         # Allocation
         self.allocation = customtkinter.CTkLabel(self.l_frame, text="Allocation",
@@ -109,6 +129,7 @@ class SchedulerRView(customtkinter.CTkFrame):
         self.allocation_entry.place(relx=0.5,
                                     rely=0.42,
                                     anchor=customtkinter.CENTER)
+        self.allocation_entry.bind("<Return>", self.submit_allocation)
 
         # mid Frame
         self.m_frame = customtkinter.CTkLabel(self, text='',
@@ -179,6 +200,7 @@ class SchedulerRView(customtkinter.CTkFrame):
         self.name_entry.place(relx=0.5,
                               rely=0.25,
                               anchor=customtkinter.CENTER)
+        self.name_entry.bind("<Return>", self.submit_name)
 
         # availability
         self.availability = customtkinter.CTkLabel(self.m_frame, text="Availability",
@@ -203,6 +225,7 @@ class SchedulerRView(customtkinter.CTkFrame):
         self.availability_entry.place(relx=0.5,
                                       rely=0.42,
                                       anchor=customtkinter.CENTER)
+        self.availability_entry.bind("<Return>", self.submit_availability)
 
         # worse_availability
         self.worse_availability = customtkinter.CTkLabel(self.m_frame, text="Worse availability",
@@ -227,6 +250,7 @@ class SchedulerRView(customtkinter.CTkFrame):
         self.worse_availability_entry.place(relx=0.5,
                                             rely=0.58,
                                             anchor=customtkinter.CENTER)
+        self.worse_availability_entry.bind("<Return>", self.submit_worse_availability)
 
         # position
         self.position = customtkinter.CTkLabel(self.m_frame, text="Position",
@@ -251,6 +275,7 @@ class SchedulerRView(customtkinter.CTkFrame):
         self.position_entry.place(relx=0.5,
                                   rely=0.74,
                                   anchor=customtkinter.CENTER)
+        self.position_entry.bind("<Return>", self.submit_position)
 
         # right Frame
         self.r_frame = customtkinter.CTkLabel(self, text='',
@@ -274,6 +299,7 @@ class SchedulerRView(customtkinter.CTkFrame):
                         rely=0.10,
                         anchor=customtkinter.CENTER)
 
+        # export_button
         self.export_button = customtkinter.CTkButton(self, text="Export",
                                                      width=250,
                                                      height=50,
@@ -286,3 +312,33 @@ class SchedulerRView(customtkinter.CTkFrame):
         self.export_button.place(relx=0.5,
                                  rely=0.85,
                                  anchor=customtkinter.CENTER)
+
+    def submit_accuracy(self, event):
+        accuracy_value = self.accuracy_entry.get()
+        if accuracy_value:
+            self.parent.handle_data_submission({'accuracy': accuracy_value})
+
+    def submit_allocation(self, event):
+        allocation_value = self.allocation_entry.get()
+        if allocation_value:
+            self.parent.handle_data_submission({'allocation': allocation_value})
+
+    def submit_name(self, event):
+        name_value = self.name_entry.get()
+        if name_value:
+            self.parent.handle_data_submission({'name': name_value})
+
+    def submit_availability(self, event):
+        availability_value = self.availability_entry.get()
+        if availability_value:
+            self.parent.handle_data_submission({'availability': availability_value})
+
+    def submit_worse_availability(self, event):
+        worse_availability_value = self.worse_availability_entry.get()
+        if worse_availability_value:
+            self.parent.handle_data_submission({'worse_availability': worse_availability_value})
+
+    def submit_position(self, event):
+        position_value = self.position_entry.get()
+        if position_value:
+            self.parent.handle_data_submission({'position': position_value})

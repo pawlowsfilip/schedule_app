@@ -2,13 +2,11 @@ import customtkinter
 from gui.scheduler_r_view import SchedulerRView
 from gui.scheduler_s_view import SchedulerSView
 
-def dropdown_callback(value, app):
-    print("Dropdown selected:", value)
-    app.change_view(value)
 
 class DefaultView(customtkinter.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
+        self.parent = parent
         self.pack(fill="both", expand=True)
 
         # Title Label
@@ -40,7 +38,7 @@ class DefaultView(customtkinter.CTkFrame):
         # Dropdown
         self.dropdown = customtkinter.CTkComboBox(self.frame,
                                                   values=["Restaurant", "School"],
-                                                  command=lambda value: dropdown_callback(value, self),
+                                                  command=lambda value: self.dropdown_callback(value),
                                                   width=225,
                                                   height=40,
                                                   font=("Inter", 14),
@@ -52,7 +50,7 @@ class DefaultView(customtkinter.CTkFrame):
                                                   border_color="#2b2b2b",
                                                   button_color='#2b2b2b',
                                                   dropdown_font=("Inter", 14))
-        self.dropdown.place(relx=0.5, rely=0.32, anchor=customtkinter.CENTER)  # Adjust rely as needed
+        self.dropdown.place(relx=0.5, rely=0.32, anchor=customtkinter.CENTER)
         self.dropdown.set("Choose schedule type")
         self.dropdown.bind("<FocusIn>", self.disable_text_input)
 
@@ -64,16 +62,11 @@ class DefaultView(customtkinter.CTkFrame):
                                                     justify="left")
         self.location_info.place(relx=0.5, rely=0.42, anchor=customtkinter.CENTER)
 
+    def dropdown_callback(self, value):
+        self.parent.notify_view_change(value)
+
     def disable_text_input(self, event):
         self.focus_set()
 
-    def change_view(self, view_name):
-        # Remove all widgets in the window
-        for widget in self.winfo_children():
-            widget.destroy()
-
-        # Depending on the selection, load the appropriate view
-        if view_name == "Restaurant":
-            self.scheduler_r_view = SchedulerRView(self)
-        elif view_name == "School":
-            self.scheduler_s_view = SchedulerSView(self)
+    def change_view(self, view_name, variant):
+        self.parent.change_view(view_name, variant)
