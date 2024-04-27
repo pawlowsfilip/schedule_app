@@ -6,9 +6,10 @@ from CTkToolTip import *
 class SchedulerSView(customtkinter.CTkFrame):
     """ Frame for the 'Scheduler_S' option within the main application window. """
 
-    def __init__(self, parent):
+    def __init__(self, parent, gui):
         super().__init__(parent, fg_color="transparent")
         self.parent = parent
+        self.gui = gui
         self.pack(fill="both", expand=True)
         self.create_view()
 
