@@ -56,10 +56,11 @@ class SchedulerSView(customtkinter.CTkFrame):
                                                           font=("Inter", 23, 'bold'),
                                                           fg_color="#333333",
                                                           text_color="#f2f2f2",
-                                                          justify="left")
-        self.schedule_properties.place(relx=0.47,
+                                                          justify="left",
+                                                          anchor='w')
+        self.schedule_properties.place(relx=0.15,
                                        rely=0.10,
-                                       anchor=customtkinter.CENTER)
+                                       anchor=customtkinter.W)
 
         # info
         self.info_icon = customtkinter.CTkImage(
@@ -84,24 +85,26 @@ class SchedulerSView(customtkinter.CTkFrame):
 
         # Time frames
         self.time_frames = customtkinter.CTkLabel(self.l_frame, text="Time frames",
-                                               font=("Inter", 18),
-                                               fg_color="#333333",
-                                               text_color="#f2f2f2",
-                                               justify="left")
-        self.time_frames.place(relx=0.3,
-                            rely=0.175,
-                            anchor=customtkinter.CENTER)
+                                                  font=("Inter", 18),
+                                                  fg_color="#333333",
+                                                  text_color="#f2f2f2",
+                                                  justify="left",
+                                                  anchor='w')
+        self.time_frames.place(relx=0.15,
+                               rely=0.175,
+                               anchor=customtkinter.W)
         self.time_frames_entry = customtkinter.CTkEntry(self.l_frame,
-                                                     placeholder_text='Type here...',
-                                                     border_color="#2b2b2b",
-                                                     width=250,
-                                                     height=40,
-                                                     fg_color="#2b2b2b",
-                                                     text_color="#f2f2f2",
-                                                     font=("Inter", 14))
+                                                        placeholder_text='Type here...',
+                                                        border_color="#2b2b2b",
+                                                        width=250,
+                                                        height=40,
+                                                        fg_color="#2b2b2b",
+                                                        text_color="#f2f2f2",
+                                                        font=("Inter", 14))
         self.time_frames_entry.place(relx=0.5,
-                                  rely=0.25,
-                                  anchor=customtkinter.CENTER)
+                                     rely=0.25,
+                                     anchor=customtkinter.CENTER)
+        self.time_frames_entry.bind("<Return>", self.submit_time_frames)
 
         # mid Frame
         self.m_frame = customtkinter.CTkLabel(self, text='',
@@ -120,10 +123,11 @@ class SchedulerSView(customtkinter.CTkFrame):
                                              font=("Inter", 25, 'bold'),
                                              fg_color="#333333",
                                              text_color="#f2f2f2",
-                                             justify="left")
-        self.worker.place(relx=0.275,
+                                             justify="left",
+                                             anchor='w')
+        self.worker.place(relx=0.15,
                           rely=0.10,
-                          anchor=customtkinter.CENTER)
+                          anchor=customtkinter.W)
 
         # info
         self.info_icon = customtkinter.CTkImage(
@@ -155,10 +159,11 @@ class SchedulerSView(customtkinter.CTkFrame):
                                            font=("Inter", 18),
                                            fg_color="#333333",
                                            text_color="#f2f2f2",
-                                           justify="left")
-        self.name.place(relx=0.22,
+                                           justify="left",
+                                           anchor='w')
+        self.name.place(relx=0.15,
                         rely=0.175,
-                        anchor=customtkinter.CENTER)
+                        anchor=customtkinter.W)
         self.name_entry = customtkinter.CTkEntry(self.m_frame,
                                                  placeholder_text='Type here...',
                                                  border_color="#2b2b2b",
@@ -170,17 +175,20 @@ class SchedulerSView(customtkinter.CTkFrame):
         self.name_entry.place(relx=0.5,
                               rely=0.25,
                               anchor=customtkinter.CENTER)
+        self.name_entry.bind("<Return>", self.submit_name)
+
 
         # availability
         self.availability = customtkinter.CTkLabel(self.m_frame, text="Availability",
                                                    font=("Inter", 18),
                                                    fg_color="#333333",
                                                    text_color="#f2f2f2",
-                                                   justify="left")
+                                                   justify="left",
+                                                   anchor='w')
 
-        self.availability.place(relx=0.275,
+        self.availability.place(relx=0.15,
                                 rely=0.34,
-                                anchor=customtkinter.CENTER)
+                                anchor=customtkinter.W)
 
         self.availability_entry = customtkinter.CTkEntry(self.m_frame,
                                                          placeholder_text='Type here...',
@@ -194,17 +202,20 @@ class SchedulerSView(customtkinter.CTkFrame):
         self.availability_entry.place(relx=0.5,
                                       rely=0.42,
                                       anchor=customtkinter.CENTER)
+        self.availability_entry.bind("<Return>", self.submit_availability)
+
 
         # worse_availability
         self.worse_availability = customtkinter.CTkLabel(self.m_frame, text="Worse availability",
                                                          font=("Inter", 18),
                                                          fg_color="#333333",
                                                          text_color="#f2f2f2",
-                                                         justify="left")
+                                                         justify="left",
+                                                         anchor='w')
 
-        self.worse_availability.place(relx=0.36,
+        self.worse_availability.place(relx=0.15,
                                       rely=0.50,
-                                      anchor=customtkinter.CENTER)
+                                      anchor=customtkinter.W)
 
         self.worse_availability_entry = customtkinter.CTkEntry(self.m_frame,
                                                                placeholder_text='Type here...',
@@ -218,6 +229,8 @@ class SchedulerSView(customtkinter.CTkFrame):
         self.worse_availability_entry.place(relx=0.5,
                                             rely=0.58,
                                             anchor=customtkinter.CENTER)
+        self.worse_availability_entry.bind("<Return>", self.submit_worse_availability)
+
 
         # right Frame
         self.r_frame = customtkinter.CTkLabel(self, text='',
@@ -233,23 +246,65 @@ class SchedulerSView(customtkinter.CTkFrame):
 
         # Data
         self.data = customtkinter.CTkLabel(self.r_frame, text="Data",
-                                             font=("Inter", 25, 'bold'),
-                                             fg_color="#333333",
-                                             text_color="#f2f2f2",
-                                             justify="left")
+                                           font=("Inter", 25, 'bold'),
+                                           fg_color="#333333",
+                                           text_color="#f2f2f2",
+                                           justify="left")
         self.data.place(relx=0.15,
-                          rely=0.10,
-                          anchor=customtkinter.CENTER)
+                        rely=0.10,
+                        anchor=customtkinter.CENTER)
+
+        # showing data
+        self.setup_display_areas()
 
         self.export_button = customtkinter.CTkButton(self, text="Export",
-                                                      width=250,
-                                                      height=50,
-                                                      fg_color="#f2f2f2",
-                                                      text_color="#333333",
-                                                      corner_radius=50,
-                                                      hover_color='#a1a1a1',
-                                                      font=("Inter", 20, 'bold'))
+                                                     width=250,
+                                                     height=50,
+                                                     fg_color="#f2f2f2",
+                                                     text_color="#333333",
+                                                     corner_radius=50,
+                                                     hover_color='#a1a1a1',
+                                                     font=("Inter", 20, 'bold'))
 
         self.export_button.place(relx=0.5,
                                  rely=0.85,
                                  anchor=customtkinter.CENTER)
+
+
+    def setup_display_areas(self):
+        # Labels to display data dynamically
+        self.display_time_frames = customtkinter.CTkLabel(self.r_frame, text="Time frames: ", font=("Inter", 16), fg_color="#333333", text_color="#f2f2f2", width=500, height=40, anchor='w')
+        self.display_time_frames.place(relx=0.1, rely=0.2, anchor=customtkinter.W)
+
+        self.display_name = customtkinter.CTkLabel(self.r_frame, text="Name: ", font=("Inter: ", 16), fg_color="#333333", text_color="#f2f2f2", width=500, height=40, anchor='w')
+        self.display_name.place(relx=0.1, rely=0.3, anchor=customtkinter.W)
+
+        self.display_availability = customtkinter.CTkLabel(self.r_frame, text="Availability: ", font=("Inter", 16), fg_color="#333333", text_color="#f2f2f2", width=500, height=40, anchor='w')
+        self.display_availability.place(relx=0.1, rely=0.4, anchor=customtkinter.W)
+
+        self.display_worse_availability = customtkinter.CTkLabel(self.r_frame, text="Worse availability: ", font=("Inter", 16), fg_color="#333333", text_color="#f2f2f2", width=500, height=40, anchor='w')
+        self.display_worse_availability.place(relx=0.1, rely=0.5, anchor=customtkinter.W)
+
+    def submit_time_frames(self, event):
+        time_frames_value = self.time_frames_entry.get()
+        if time_frames_value:
+            self.display_time_frames.configure(text=f"Time frames: {time_frames_value}")
+            self.parent.handle_data_submission({'time_frames': time_frames_value})
+
+    def submit_name(self, event):
+        name_value = self.name_entry.get()
+        if name_value:
+            self.display_name.configure(text=f"Name: {name_value}")
+            self.parent.handle_data_submission({'name': name_value})
+
+    def submit_availability(self, event):
+        availability_value = self.availability_entry.get()
+        if availability_value:
+            self.display_availability.configure(text=f"Availability: {availability_value}")
+            self.parent.handle_data_submission({'availability': availability_value})
+
+    def submit_worse_availability(self, event):
+        worse_availability_value = self.worse_availability_entry.get()
+        if worse_availability_value:
+            self.display_worse_availability.configure(text=f"Worse availability: {worse_availability_value}")
+            self.parent.handle_data_submission({'worse_availability': worse_availability_value})
