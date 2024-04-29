@@ -56,10 +56,11 @@ class SchedulerRView(customtkinter.CTkFrame):
                                                           font=("Inter", 23, 'bold'),
                                                           fg_color="#333333",
                                                           text_color="#f2f2f2",
-                                                          justify="left")
-        self.schedule_properties.place(relx=0.47,
+                                                          justify="left",
+                                                          anchor='w')
+        self.schedule_properties.place(relx=0.15,
                                        rely=0.10,
-                                       anchor=customtkinter.CENTER)
+                                       anchor=customtkinter.W)
 
         # info
         self.info_icon = customtkinter.CTkImage(
@@ -89,10 +90,11 @@ class SchedulerRView(customtkinter.CTkFrame):
                                                font=("Inter", 18),
                                                fg_color="#333333",
                                                text_color="#f2f2f2",
-                                               justify="left")
-        self.accuracy.place(relx=0.26,
+                                               justify="left",
+                                               anchor='w')
+        self.accuracy.place(relx=0.15,
                             rely=0.175,
-                            anchor=customtkinter.CENTER)
+                            anchor=customtkinter.W)
         self.accuracy_entry = customtkinter.CTkEntry(self.l_frame,
                                                      placeholder_text='Type here...',
                                                      border_color="#2b2b2b",
@@ -111,11 +113,12 @@ class SchedulerRView(customtkinter.CTkFrame):
                                                  font=("Inter", 18),
                                                  fg_color="#333333",
                                                  text_color="#f2f2f2",
-                                                 justify="left")
+                                                 justify="left",
+                                                 anchor='w')
 
-        self.allocation.place(relx=0.26,
+        self.allocation.place(relx=0.15,
                               rely=0.34,
-                              anchor=customtkinter.CENTER)
+                              anchor=customtkinter.W)
 
         self.allocation_entry = customtkinter.CTkEntry(self.l_frame,
                                                        placeholder_text='Type here...',
@@ -148,10 +151,11 @@ class SchedulerRView(customtkinter.CTkFrame):
                                              font=("Inter", 25, 'bold'),
                                              fg_color="#333333",
                                              text_color="#f2f2f2",
-                                             justify="left")
-        self.worker.place(relx=0.275,
+                                             justify="left",
+                                             anchor='w')
+        self.worker.place(relx=0.15,
                           rely=0.10,
-                          anchor=customtkinter.CENTER)
+                          anchor=customtkinter.W)
 
         # info
         self.info_icon = customtkinter.CTkImage(
@@ -185,10 +189,11 @@ class SchedulerRView(customtkinter.CTkFrame):
                                            font=("Inter", 18),
                                            fg_color="#333333",
                                            text_color="#f2f2f2",
-                                           justify="left")
-        self.name.place(relx=0.22,
+                                           justify="left",
+                                           anchor='w')
+        self.name.place(relx=0.15,
                         rely=0.175,
-                        anchor=customtkinter.CENTER)
+                        anchor=customtkinter.W)
         self.name_entry = customtkinter.CTkEntry(self.m_frame,
                                                  placeholder_text='Type here...',
                                                  border_color="#2b2b2b",
@@ -207,11 +212,12 @@ class SchedulerRView(customtkinter.CTkFrame):
                                                    font=("Inter", 18),
                                                    fg_color="#333333",
                                                    text_color="#f2f2f2",
-                                                   justify="left")
+                                                   justify="left",
+                                                   anchor='w')
 
-        self.availability.place(relx=0.275,
+        self.availability.place(relx=0.15,
                                 rely=0.34,
-                                anchor=customtkinter.CENTER)
+                                anchor=customtkinter.W)
 
         self.availability_entry = customtkinter.CTkEntry(self.m_frame,
                                                          placeholder_text='Type here...',
@@ -232,11 +238,12 @@ class SchedulerRView(customtkinter.CTkFrame):
                                                          font=("Inter", 18),
                                                          fg_color="#333333",
                                                          text_color="#f2f2f2",
-                                                         justify="left")
+                                                         justify="left",
+                                                         anchor='w')
 
-        self.worse_availability.place(relx=0.36,
+        self.worse_availability.place(relx=0.15,
                                       rely=0.50,
-                                      anchor=customtkinter.CENTER)
+                                      anchor=customtkinter.W)
 
         self.worse_availability_entry = customtkinter.CTkEntry(self.m_frame,
                                                                placeholder_text='Type here...',
@@ -257,11 +264,12 @@ class SchedulerRView(customtkinter.CTkFrame):
                                                font=("Inter", 18),
                                                fg_color="#333333",
                                                text_color="#f2f2f2",
-                                               justify="left")
+                                               justify="left",
+                                               anchor='w')
 
-        self.position.place(relx=0.245,
+        self.position.place(relx=0.15,
                             rely=0.66,
-                            anchor=customtkinter.CENTER)
+                            anchor=customtkinter.W)
 
         self.position_entry = customtkinter.CTkEntry(self.m_frame,
                                                      placeholder_text='Type here...',
@@ -285,19 +293,21 @@ class SchedulerRView(customtkinter.CTkFrame):
                                               fg_color="#333333",
                                               corner_radius=50)
 
-        self.r_frame.place(relx=0.769,
-                           rely=0.48,
-                           anchor=customtkinter.CENTER)
+        self.r_frame.place(relx=0.966, rely=0.48, anchor=customtkinter.E)
 
         # Data
         self.data = customtkinter.CTkLabel(self.r_frame, text="Data",
                                            font=("Inter", 25, 'bold'),
                                            fg_color="#333333",
                                            text_color="#f2f2f2",
-                                           justify="left")
-        self.data.place(relx=0.15,
+                                           justify="left",
+                                           anchor='w')
+        self.data.place(relx=0.1,
                         rely=0.10,
-                        anchor=customtkinter.CENTER)
+                        anchor=customtkinter.W)
+
+        # showing data
+        self.setup_display_areas()
 
         # export_button
         self.export_button = customtkinter.CTkButton(self, text="Export",
@@ -313,32 +323,58 @@ class SchedulerRView(customtkinter.CTkFrame):
                                  rely=0.85,
                                  anchor=customtkinter.CENTER)
 
+    def setup_display_areas(self):
+        # Labels to display data dynamically
+        self.display_accuracy = customtkinter.CTkLabel(self.r_frame, text="Accuracy: ", font=("Inter", 16), fg_color="#333333", text_color="#f2f2f2", width=500, height=40, anchor='w')
+        self.display_accuracy.place(relx=0.1, rely=0.2, anchor=customtkinter.W)
+
+        self.display_allocation = customtkinter.CTkLabel(self.r_frame, text="Allocation: ", font=("Inter", 16), fg_color="#333333", text_color="#f2f2f2", width=500, height=40, anchor='w')
+        self.display_allocation.place(relx=0.1, rely=0.3, anchor=customtkinter.W)
+
+        self.display_name = customtkinter.CTkLabel(self.r_frame, text="Name", font=("Inter: ", 16), fg_color="#333333", text_color="#f2f2f2", width=500, height=40, anchor='w')
+        self.display_name.place(relx=0.1, rely=0.4, anchor=customtkinter.W)
+
+        self.display_availability = customtkinter.CTkLabel(self.r_frame, text="Availability: ", font=("Inter", 16), fg_color="#333333", text_color="#f2f2f2", width=500, height=40, anchor='w')
+        self.display_availability.place(relx=0.1, rely=0.5, anchor=customtkinter.W)
+
+        self.display_worse_availability = customtkinter.CTkLabel(self.r_frame, text="Worse availability: ", font=("Inter", 16), fg_color="#333333", text_color="#f2f2f2", width=500, height=40, anchor='w')
+        self.display_worse_availability.place(relx=0.1, rely=0.6, anchor=customtkinter.W)
+
+        self.display_position = customtkinter.CTkLabel(self.r_frame, text="Position", font=("Inter: ", 16), fg_color="#333333", text_color="#f2f2f2", width=500, height=40, anchor='w')
+        self.display_position.place(relx=0.1, rely=0.7, anchor=customtkinter.W)
+
     def submit_accuracy(self, event):
         accuracy_value = self.accuracy_entry.get()
         if accuracy_value:
+            self.display_accuracy.configure(text=f"Accuracy: {accuracy_value}")
             self.parent.handle_data_submission({'accuracy': accuracy_value})
 
     def submit_allocation(self, event):
         allocation_value = self.allocation_entry.get()
         if allocation_value:
+            self.display_allocation.configure(text=f"Allocation: {allocation_value}")
             self.parent.handle_data_submission({'allocation': allocation_value})
 
     def submit_name(self, event):
         name_value = self.name_entry.get()
         if name_value:
+            self.display_name.configure(text=f"Name: {name_value}")
             self.parent.handle_data_submission({'name': name_value})
 
     def submit_availability(self, event):
         availability_value = self.availability_entry.get()
         if availability_value:
+            self.display_availability.configure(text=f"Availability: {availability_value}")
             self.parent.handle_data_submission({'availability': availability_value})
 
     def submit_worse_availability(self, event):
         worse_availability_value = self.worse_availability_entry.get()
         if worse_availability_value:
+            self.display_worse_availability.configure(text=f"Worse availability: {worse_availability_value}")
             self.parent.handle_data_submission({'worse_availability': worse_availability_value})
 
     def submit_position(self, event):
         position_value = self.position_entry.get()
         if position_value:
+            self.display_position.configure(text=f"Position: {position_value}")
             self.parent.handle_data_submission({'position': position_value})

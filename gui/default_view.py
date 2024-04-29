@@ -32,8 +32,9 @@ class DefaultView(customtkinter.CTkFrame):
                                                         font=("Inter", 19),
                                                         fg_color="#333333",
                                                         text_color="#f2f2f2",
-                                                        justify="left")
-        self.instruction_label.place(relx=0.5, rely=0.2, anchor=customtkinter.CENTER)
+                                                        justify="left",
+                                                        anchor='w')
+        self.instruction_label.place(relx=0.15, rely=0.2, anchor=customtkinter.W)
 
         # Dropdown
         self.dropdown = customtkinter.CTkComboBox(self.frame,
@@ -59,8 +60,9 @@ class DefaultView(customtkinter.CTkFrame):
                                                     font=("Inter", 12),
                                                     fg_color="#333333",
                                                     text_color="#787878",
-                                                    justify="left")
-        self.location_info.place(relx=0.5, rely=0.42, anchor=customtkinter.CENTER)
+                                                    justify="left",
+                                                    anchor='w')
+        self.location_info.place(relx=0.12, rely=0.42, anchor=customtkinter.W)
 
     def dropdown_callback(self, value):
         self.parent.notify_view_change(value)
