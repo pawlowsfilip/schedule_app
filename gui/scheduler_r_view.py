@@ -347,34 +347,34 @@ class SchedulerRView(customtkinter.CTkFrame):
         accuracy_value = self.accuracy_entry.get()
         if accuracy_value:
             self.display_accuracy.configure(text=f"Accuracy: {accuracy_value}")
-            self.parent.handle_data_submission({'accuracy': accuracy_value})
+            self.parent.update_scheduler_parameters({'accuracy': accuracy_value})
 
     def submit_allocation(self, event):
         allocation_value = self.allocation_entry.get()
         if allocation_value:
             self.display_allocation.configure(text=f"Allocation: {allocation_value}")
-            self.parent.handle_data_submission({'allocation': allocation_value})
+            self.parent.update_scheduler_parameters({'allocation': allocation_value})
 
     def submit_name(self, event):
         name_value = self.name_entry.get()
         if name_value:
             self.display_name.configure(text=f"Name: {name_value}")
-            self.parent.handle_data_submission({'name': name_value})
+            self.parent.update_scheduler_parameters({'name': name_value})
 
     def submit_availability(self, event):
         availability_value = self.availability_entry.get()
         if availability_value:
             self.display_availability.configure(text=f"Availability: {availability_value}")
-            self.parent.handle_data_submission({'availability': availability_value})
+            self.parent.update_scheduler_parameters({'availability': availability_value})
 
     def submit_worse_availability(self, event):
         worse_availability_value = self.worse_availability_entry.get()
         if worse_availability_value:
             self.display_worse_availability.configure(text=f"Worse availability: {worse_availability_value}")
-            self.parent.handle_data_submission({'worse_availability': worse_availability_value})
+            self.parent.update_scheduler_parameters({'worse_availability': worse_availability_value})
 
     def submit_position(self, event):
         position_value = self.position_entry.get()
         if position_value:
             self.display_position.configure(text=f"Position: {position_value}")
-            self.parent.handle_data_submission({'position': position_value})
+            self.parent.update_scheduler_parameters({'position': position_value})
