@@ -38,9 +38,19 @@ class App(customtkinter.CTk):
         self.gui = Gui(variant)  # This sets up the backend based on the selection
         print(self.gui)
 
-    def handle_data_submission(self, data):
-        print("Data received:", data)
-
+    def update_scheduler_parameters(self, parameters):
+        if 'accuracy' in parameters:
+            self.gui.update_accuracy(parameters['accuracy'])
+        if 'allocation' in parameters:
+            self.gui.update_allocation(parameters['allocation'])
+        if 'name' in parameters:
+            self.gui.update_name(parameters['name'])
+        if 'availability' in parameters:
+            self.gui.update_availability(parameters['availability'])
+        if 'worse_availability' in parameters:
+            self.gui.update_worse_availability(parameters['worse_availability'])
+        if 'position' in parameters:
+            self.gui.update_position(parameters['position'])
 
 app = App()
 app.mainloop()
