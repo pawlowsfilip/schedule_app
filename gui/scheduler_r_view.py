@@ -317,7 +317,8 @@ class SchedulerRView(customtkinter.CTkFrame):
                                                      text_color="#333333",
                                                      corner_radius=50,
                                                      hover_color='#a1a1a1',
-                                                     font=("Inter", 20, 'bold'))
+                                                     font=("Inter", 20, 'bold'),
+                                                     command=self.gui.export_schedule)
 
         self.export_button.place(relx=0.5,
                                  rely=0.85,
@@ -378,3 +379,6 @@ class SchedulerRView(customtkinter.CTkFrame):
         if position_value:
             self.display_position.configure(text=f"Position: {position_value}")
             self.parent.update_scheduler_parameters({'position': position_value})
+
+    def export_scheduler(self):
+        pass
