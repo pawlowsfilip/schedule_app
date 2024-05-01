@@ -1,10 +1,12 @@
 import customtkinter
 from PIL import Image
 from CTkToolTip import *
+from database.database import read_json, write_json
 
 
 class SchedulerSView(customtkinter.CTkFrame):
     """ Frame for the 'Scheduler_S' option within the main application window. """
+    DATABASE_PATH = r"C:\Users\Filip\PycharmProjects\ScheduleApp\database\database.json"
 
     def __init__(self, parent, gui):
         super().__init__(parent, fg_color="transparent")
@@ -104,7 +106,20 @@ class SchedulerSView(customtkinter.CTkFrame):
         self.time_frames_entry.place(relx=0.5,
                                      rely=0.25,
                                      anchor=customtkinter.CENTER)
-        self.time_frames_entry.bind("<Return>", self.submit_time_frames)
+
+        self.add_time_frames = customtkinter.CTkButton(self.l_frame, text="Add",
+                                                       width=75,
+                                                       height=40,
+                                                       fg_color="#f2f2f2",
+                                                       text_color="#333333",
+                                                       corner_radius=50,
+                                                       hover_color='#a1a1a1',
+                                                       font=("Inter", 14, 'bold'),
+                                                       command=self.submit_time_frames)
+
+        self.add_time_frames.place(relx=0.5,
+                                   rely=0.85,
+                                   anchor=customtkinter.CENTER)
 
         # mid Frame
         self.m_frame = customtkinter.CTkLabel(self, text='',
@@ -175,8 +190,7 @@ class SchedulerSView(customtkinter.CTkFrame):
         self.name_entry.place(relx=0.5,
                               rely=0.25,
                               anchor=customtkinter.CENTER)
-        self.name_entry.bind("<Return>", self.submit_name)
-
+        # self.name_entry.bind("<Return>", self.submit_name)
 
         # availability
         self.availability = customtkinter.CTkLabel(self.m_frame, text="Availability",
@@ -202,8 +216,7 @@ class SchedulerSView(customtkinter.CTkFrame):
         self.availability_entry.place(relx=0.5,
                                       rely=0.42,
                                       anchor=customtkinter.CENTER)
-        self.availability_entry.bind("<Return>", self.submit_availability)
-
+        # self.availability_entry.bind("<Return>", self.submit_availability)
 
         # worse_availability
         self.worse_availability = customtkinter.CTkLabel(self.m_frame, text="Worse availability",
@@ -229,8 +242,21 @@ class SchedulerSView(customtkinter.CTkFrame):
         self.worse_availability_entry.place(relx=0.5,
                                             rely=0.58,
                                             anchor=customtkinter.CENTER)
-        self.worse_availability_entry.bind("<Return>", self.submit_worse_availability)
+        # self.worse_availability_entry.bind("<Return>", self.submit_worse_availability)
 
+        self.add_properties_button = customtkinter.CTkButton(self.m_frame, text="Add",
+                                                             width=75,
+                                                             height=40,
+                                                             fg_color="#f2f2f2",
+                                                             text_color="#333333",
+                                                             corner_radius=50,
+                                                             hover_color='#a1a1a1',
+                                                             font=("Inter", 14, 'bold'),
+                                                             command=self.submit_worker_info)
+
+        self.add_properties_button.place(relx=0.5,
+                                         rely=0.85,
+                                         anchor=customtkinter.CENTER)
 
         # right Frame
         self.r_frame = customtkinter.CTkLabel(self, text='',
@@ -270,41 +296,31 @@ class SchedulerSView(customtkinter.CTkFrame):
                                  rely=0.85,
                                  anchor=customtkinter.CENTER)
 
-
     def setup_display_areas(self):
-        # Labels to display data dynamically
-        self.display_time_frames = customtkinter.CTkLabel(self.r_frame, text="Time frames: ", font=("Inter", 16), fg_color="#333333", text_color="#f2f2f2", width=500, height=40, anchor='w')
-        self.display_time_frames.place(relx=0.1, rely=0.2, anchor=customtkinter.W)
+        pass
 
-        self.display_name = customtkinter.CTkLabel(self.r_frame, text="Name: ", font=("Inter: ", 16), fg_color="#333333", text_color="#f2f2f2", width=500, height=40, anchor='w')
-        self.display_name.place(relx=0.1, rely=0.3, anchor=customtkinter.W)
+    def clear_database(self):
+        write_json(self.DATABASE_PATH, [])
 
-        self.display_availability = customtkinter.CTkLabel(self.r_frame, text="Availability: ", font=("Inter", 16), fg_color="#333333", text_color="#f2f2f2", width=500, height=40, anchor='w')
-        self.display_availability.place(relx=0.1, rely=0.4, anchor=customtkinter.W)
-
-        self.display_worse_availability = customtkinter.CTkLabel(self.r_frame, text="Worse availability: ", font=("Inter", 16), fg_color="#333333", text_color="#f2f2f2", width=500, height=40, anchor='w')
-        self.display_worse_availability.place(relx=0.1, rely=0.5, anchor=customtkinter.W)
-
-    def submit_time_frames(self, event):
+    def submit_time_frames(self):
         time_frames_value = self.time_frames_entry.get()
         if time_frames_value:
-            self.display_time_frames.configure(text=f"Time frames: {time_frames_value}")
-            self.parent.handle_data_submission({'time_frames': time_frames_value})
+            new_data = [{'time_frames': time_frames_value}]
+            self.update_database(new_data)
 
-    def submit_name(self, event):
+    def submit_worker_info(self):
         name_value = self.name_entry.get()
-        if name_value:
-            self.display_name.configure(text=f"Name: {name_value}")
-            self.parent.handle_data_submission({'name': name_value})
-
-    def submit_availability(self, event):
         availability_value = self.availability_entry.get()
-        if availability_value:
-            self.display_availability.configure(text=f"Availability: {availability_value}")
-            self.parent.handle_data_submission({'availability': availability_value})
-
-    def submit_worse_availability(self, event):
         worse_availability_value = self.worse_availability_entry.get()
-        if worse_availability_value:
-            self.display_worse_availability.configure(text=f"Worse availability: {worse_availability_value}")
-            self.parent.handle_data_submission({'worse_availability': worse_availability_value})
+
+        if name_value and availability_value:
+            worker_info = {
+                'name': name_value,
+                'availability': availability_value,
+                'worse_availability': worse_availability_value
+            }
+            self.update_database([worker_info])
+
+    def update_database(self, new_entries):
+        # Overwrite the JSON file with the new entries
+        write_json(self.DATABASE_PATH, new_entries)

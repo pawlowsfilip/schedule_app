@@ -10,6 +10,7 @@ class Gui:
         return self.scheduler.make_schedule()
 
     def export_schedule(self):
+        print('making schedule')
         schedule = self.make_schedule()
         return ExcelExporter(schedule).export_to_excel()
 

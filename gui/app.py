@@ -52,5 +52,9 @@ class App(customtkinter.CTk):
         if 'position' in parameters:
             self.gui.update_position(parameters['position'])
 
+    def handle_data_submission(self, data):
+        print("Data received:", data)
+
+
 app = App()
 app.mainloop()
