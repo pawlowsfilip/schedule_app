@@ -2,6 +2,7 @@ import customtkinter
 from PIL import Image
 from CTkToolTip import *
 from database.database import read_json, write_json
+import json
 
 
 class SchedulerSView(customtkinter.CTkFrame):
@@ -12,8 +13,11 @@ class SchedulerSView(customtkinter.CTkFrame):
         super().__init__(parent, fg_color="transparent")
         self.parent = parent
         self.gui = gui
+        self.clear_database()
         self.pack(fill="both", expand=True)
         self.create_view()
+        self.load_scheduler_data()
+
 
     def back_to_menu(self):
         # Method to switch back to the default view
@@ -85,6 +89,28 @@ class SchedulerSView(customtkinter.CTkFrame):
                              text_color='#f2f2f2',
                              padding=(10, 10))
 
+        # day
+        self.day = customtkinter.CTkLabel(self.l_frame, text="Day",
+                                                  font=("Inter", 18),
+                                                  fg_color="#333333",
+                                                  text_color="#f2f2f2",
+                                                  justify="left",
+                                                  anchor='w')
+        self.day.place(relx=0.15,
+                               rely=0.175,
+                               anchor=customtkinter.W)
+        self.day_entry = customtkinter.CTkEntry(self.l_frame,
+                                                        placeholder_text='Type here...',
+                                                        border_color="#2b2b2b",
+                                                        width=250,
+                                                        height=40,
+                                                        fg_color="#2b2b2b",
+                                                        text_color="#f2f2f2",
+                                                        font=("Inter", 14))
+        self.day_entry.place(relx=0.5,
+                                     rely=0.25,
+                                     anchor=customtkinter.CENTER)
+
         # Time frames
         self.time_frames = customtkinter.CTkLabel(self.l_frame, text="Time frames",
                                                   font=("Inter", 18),
@@ -93,7 +119,7 @@ class SchedulerSView(customtkinter.CTkFrame):
                                                   justify="left",
                                                   anchor='w')
         self.time_frames.place(relx=0.15,
-                               rely=0.175,
+                               rely=0.34,
                                anchor=customtkinter.W)
         self.time_frames_entry = customtkinter.CTkEntry(self.l_frame,
                                                         placeholder_text='Type here...',
@@ -104,10 +130,10 @@ class SchedulerSView(customtkinter.CTkFrame):
                                                         text_color="#f2f2f2",
                                                         font=("Inter", 14))
         self.time_frames_entry.place(relx=0.5,
-                                     rely=0.25,
+                                     rely=0.42,
                                      anchor=customtkinter.CENTER)
 
-        self.add_time_frames = customtkinter.CTkButton(self.l_frame, text="Add",
+        self.add_day_time_frame = customtkinter.CTkButton(self.l_frame, text="Add",
                                                        width=75,
                                                        height=40,
                                                        fg_color="#f2f2f2",
@@ -115,9 +141,9 @@ class SchedulerSView(customtkinter.CTkFrame):
                                                        corner_radius=50,
                                                        hover_color='#a1a1a1',
                                                        font=("Inter", 14, 'bold'),
-                                                       command=self.submit_time_frames)
+                                                       command=self.submit_day_time_frame)
 
-        self.add_time_frames.place(relx=0.5,
+        self.add_day_time_frame.place(relx=0.5,
                                    rely=0.85,
                                    anchor=customtkinter.CENTER)
 
@@ -290,7 +316,8 @@ class SchedulerSView(customtkinter.CTkFrame):
                                                      text_color="#333333",
                                                      corner_radius=50,
                                                      hover_color='#a1a1a1',
-                                                     font=("Inter", 20, 'bold'))
+                                                     font=("Inter", 20, 'bold'),
+                                                     command=self.gui.export_schedule)
 
         self.export_button.place(relx=0.5,
                                  rely=0.85,
@@ -299,14 +326,16 @@ class SchedulerSView(customtkinter.CTkFrame):
     def setup_display_areas(self):
         pass
 
-    def clear_database(self):
-        write_json(self.DATABASE_PATH, [])
-
-    def submit_time_frames(self):
+    def submit_day_time_frame(self):
+        day_value = self.day_entry.get()
         time_frames_value = self.time_frames_entry.get()
-        if time_frames_value:
-            new_data = [{'time_frames': time_frames_value}]
-            self.update_database(new_data)
+        if time_frames_value and day_value:
+            properties = {
+                'day': day_value,
+                'time_frames': time_frames_value
+            }
+            self.update_database([properties])
+            self.load_scheduler_data()
 
     def submit_worker_info(self):
         name_value = self.name_entry.get()
@@ -320,7 +349,25 @@ class SchedulerSView(customtkinter.CTkFrame):
                 'worse_availability': worse_availability_value
             }
             self.update_database([worker_info])
+            self.load_scheduler_data()
 
     def update_database(self, new_entries):
-        # Overwrite the JSON file with the new entries
-        write_json(self.DATABASE_PATH, new_entries)
+        try:
+            with open(self.DATABASE_PATH, 'r') as file:
+                data = json.load(file)
+        except (FileNotFoundError, json.JSONDecodeError):
+            data = []
+
+        data.extend(new_entries)
+
+        with open(self.DATABASE_PATH, 'w') as file:
+            json.dump(data, file, indent=4)
+
+    def load_scheduler_data(self):
+        if self.gui:
+            self.gui.update_scheduler_from_json(self.DATABASE_PATH)
+        else:
+            print("GUI not initialized.")
+
+    def clear_database(self):
+        write_json(self.DATABASE_PATH, [])

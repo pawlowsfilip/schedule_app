@@ -8,38 +8,18 @@ class Scheduler_s(Scheduler):
 
     """
 
-    def __init__(self, variant: str, time_frames=None, start=None, end=None) -> None:
+    def __init__(self, variant: str, allocation=None, start=None, end=None) -> None:
         super().__init__(variant)
-        self.time_frames = time_frames
-        self.start = start
-        self.end = end
+        self.allocation = allocation
+        # self.start = start
+        # self.end = end
         self.schedule = {}
 
     def _get_time_frames_list(self):
-        time_frames = []
-
-        for day, recesses in self.time_frames.items():
-            for recess in recesses:
-                time_frame = f"{recess['start']}-{recess['end']}"
-                time_frames.append(time_frame)
-
-        return time_frames
+        return list(self.allocation.keys())
 
     def get_needed_workers_for_time_frame(self, current_time_frame):
-        if current_time_frame:
-            current_start_str, current_end_str = current_time_frame.split('-')
-            current_start = self._parse_time(current_start_str)
-            current_end = self._parse_time(current_end_str)
-
-            for day, recesses in self.time_frames.items():
-                for recess in recesses:
-                    start_time = self._parse_time(recess["start"])
-                    end_time = self._parse_time(recess["end"])
-
-                    if (start_time <= current_start < end_time) or (start_time < current_end <= end_time):
-                        return recess["allocation"]
-        else:
-            return None
+        return self.allocation.get(current_time_frame, None)
 
     def _get_previous_time_frame_worker(self, current_day, current_time_frame):
         sorted_time_frames = self._get_time_frames_list()  # This needs to return time frames in sorted order
