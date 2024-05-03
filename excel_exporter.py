@@ -12,6 +12,7 @@ class ExcelExporter:
             for time_frame, workers in time_frames.items():
                 worker_names = ', '.join([worker.name for worker in workers]) if workers else "No worker"
                 data.append({'Date': day, 'Time Frame': time_frame, 'Workers': worker_names})
+                print('DataFrame:', pd.DataFrame(data))
         return pd.DataFrame(data)
 
     def pivot_schedule(self):
@@ -20,6 +21,7 @@ class ExcelExporter:
         pivot_df = df.pivot(index='Time Frame', columns='Date', values='Workers')
         pivot_df.reset_index(inplace=True)
         pivot_df.columns.name = None  # Remove the hierarchy on the columns
+        print('Pivoted DataFrame:', pivot_df)
         return pivot_df
 
     def export_to_excel(self, filename='schedule_r.xlsx'):
@@ -65,3 +67,4 @@ class ExcelExporter:
             })
 
             worksheet.autofit()
+            print('schedule exported to {}'.format(filename))

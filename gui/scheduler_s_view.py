@@ -342,14 +342,29 @@ class SchedulerSView(customtkinter.CTkFrame):
         availability_value = self.availability_entry.get()
         worse_availability_value = self.worse_availability_entry.get()
 
-        if name_value and availability_value:
+        # Convert the availability values into dictionaries using separate functions
+        availability_dict = self.parse_availability(availability_value)
+        worse_availability_dict = self.parse_availability(worse_availability_value)
+
+        if name_value and availability_dict:
             worker_info = {
                 'name': name_value,
-                'availability': availability_value,
-                'worse_availability': worse_availability_value
+                'availability': availability_dict,
+                'worse_availability': worse_availability_dict
             }
             self.update_database([worker_info])
             self.load_scheduler_data()
+
+    @staticmethod
+    def parse_availability(availability_str):
+        availability_dict = {}
+        if availability_str:
+            try:
+                day, time_frame = availability_str.split(": ")
+                availability_dict[day] = time_frame
+            except ValueError:
+                print("Invalid availability format. Use 'day: time_frame'")
+        return availability_dict
 
     def update_database(self, new_entries):
         try:

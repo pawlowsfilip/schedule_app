@@ -16,6 +16,7 @@ class Gui:
     def export_schedule(self):
         print('making schedule')
         schedule = self.make_schedule()
+        print('Schedule data:', schedule)
         return ExcelExporter(schedule).export_to_excel()
 
     def update_day(self, day):
