@@ -53,6 +53,7 @@ class Worker:
 
     @staticmethod
     def _str_to_time(time_str):
+        time_str = time_str.strip()
         return datetime.strptime(time_str, "%H:%M").time()
 
     @staticmethod

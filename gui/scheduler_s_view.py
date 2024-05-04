@@ -18,10 +18,9 @@ class SchedulerSView(customtkinter.CTkFrame):
         self.create_view()
         self.load_scheduler_data()
 
-
     def back_to_menu(self):
         # Method to switch back to the default view
-        self.parent.change_view("DefaultView")  # Make sure the App class can handle this view name
+        self.parent.change_view("DefaultView")
 
     def create_view(self):
         # back button
@@ -91,25 +90,25 @@ class SchedulerSView(customtkinter.CTkFrame):
 
         # day
         self.day = customtkinter.CTkLabel(self.l_frame, text="Day",
-                                                  font=("Inter", 18),
-                                                  fg_color="#333333",
-                                                  text_color="#f2f2f2",
-                                                  justify="left",
-                                                  anchor='w')
+                                          font=("Inter", 18),
+                                          fg_color="#333333",
+                                          text_color="#f2f2f2",
+                                          justify="left",
+                                          anchor='w')
         self.day.place(relx=0.15,
-                               rely=0.175,
-                               anchor=customtkinter.W)
+                       rely=0.175,
+                       anchor=customtkinter.W)
         self.day_entry = customtkinter.CTkEntry(self.l_frame,
-                                                        placeholder_text='Type here...',
-                                                        border_color="#2b2b2b",
-                                                        width=250,
-                                                        height=40,
-                                                        fg_color="#2b2b2b",
-                                                        text_color="#f2f2f2",
-                                                        font=("Inter", 14))
+                                                placeholder_text='Type here...',
+                                                border_color="#2b2b2b",
+                                                width=250,
+                                                height=40,
+                                                fg_color="#2b2b2b",
+                                                text_color="#f2f2f2",
+                                                font=("Inter", 14))
         self.day_entry.place(relx=0.5,
-                                     rely=0.25,
-                                     anchor=customtkinter.CENTER)
+                             rely=0.25,
+                             anchor=customtkinter.CENTER)
 
         # Time frames
         self.time_frames = customtkinter.CTkLabel(self.l_frame, text="Time frames",
@@ -323,9 +322,6 @@ class SchedulerSView(customtkinter.CTkFrame):
                                  rely=0.85,
                                  anchor=customtkinter.CENTER)
 
-    def setup_display_areas(self):
-        pass
-
     def submit_day_time_frame(self):
         day_value = self.day_entry.get()
         time_frames_value = self.time_frames_entry.get()
@@ -336,20 +332,26 @@ class SchedulerSView(customtkinter.CTkFrame):
             }
             self.update_database([properties])
             self.load_scheduler_data()
+            self.update_display_areas()
 
     def submit_worker_info(self):
         name_value = self.name_entry.get()
         availability_value = self.availability_entry.get()
         worse_availability_value = self.worse_availability_entry.get()
 
-        if name_value and availability_value:
+        # Convert the availability values into dictionaries using separate functions
+        availability_dict = self.parse_availability(availability_value)
+        worse_availability_dict = self.parse_availability(worse_availability_value)
+
+        if name_value and availability_dict:
             worker_info = {
                 'name': name_value,
-                'availability': availability_value,
-                'worse_availability': worse_availability_value
+                'availability': availability_dict,
+                'worse_availability': worse_availability_dict
             }
             self.update_database([worker_info])
             self.load_scheduler_data()
+            self.update_display_areas()
 
     def update_database(self, new_entries):
         try:
@@ -371,3 +373,65 @@ class SchedulerSView(customtkinter.CTkFrame):
 
     def clear_database(self):
         write_json(self.DATABASE_PATH, [])
+
+    def setup_display_areas(self):
+        self.display_accuracy = customtkinter.CTkLabel(self.r_frame, text="Day: ", font=("Inter", 16), fg_color="#333333", text_color="#f2f2f2", width=500, height=40, anchor='w')
+        self.display_accuracy.place(relx=0.1, rely=0.2, anchor=customtkinter.W)
+
+        self.display_allocation = customtkinter.CTkLabel(self.r_frame, text="Time frames: ", font=("Inter", 16), fg_color="#333333", text_color="#f2f2f2", width=500, height=40, anchor='w')
+        self.display_allocation.place(relx=0.1, rely=0.3, anchor=customtkinter.W)
+
+        self.display_name = customtkinter.CTkLabel(self.r_frame, text="Name", font=("Inter: ", 16), fg_color="#333333", text_color="#f2f2f2", width=500, height=40, anchor='w')
+        self.display_name.place(relx=0.1, rely=0.4, anchor=customtkinter.W)
+
+        self.display_availability = customtkinter.CTkLabel(self.r_frame, text="Availability: ", font=("Inter", 16), fg_color="#333333", text_color="#f2f2f2", width=500, height=40, anchor='w')
+        self.display_availability.place(relx=0.1, rely=0.5, anchor=customtkinter.W)
+
+        self.display_worse_availability = customtkinter.CTkLabel(self.r_frame, text="Worse availability: ", font=("Inter", 16), fg_color="#333333", text_color="#f2f2f2", width=500, height=40, anchor='w')
+        self.display_worse_availability.place(relx=0.1, rely=0.6, anchor=customtkinter.W)
+
+    def update_display_areas(self):
+        pass
+        # data_entries = self.read_json_data(self.DATABASE_PATH)
+        #
+        # day_text = "Day: N/A"
+        # time_frames_text = "Time frames: N/A"
+        # name_text = "Name: N/A"
+        # availability_text = "Availability: N/A"
+        # worse_availability_text = "Worse availability: N/A"
+        #
+        # if data_entries:
+        #     for entry in data_entries:
+        #         if "day" in entry and "time_frames" in entry:
+        #             day_text = f"Day: {entry['day']}"
+        #             time_frames_text = f"Time frames: {entry['time_frames']}"
+        #         if "name" in entry:
+        #             name_text = f"Name: {entry['name']}"
+        #             availability_text = f"Availability: {entry['availability']}"
+        #             worse_availability_text = f"Worse availability: {entry['worse_availability']}"
+        #         break
+        #
+        # self.display_accuracy.configure(text=day_text)
+        # self.display_allocation.configure(text=time_frames_text)
+        # self.display_name.configure(text=name_text)
+        # self.display_availability.configure(text=availability_text)
+        # self.display_worse_availability.configure(text=worse_availability_text)
+
+    @staticmethod
+    def parse_availability(availability_str):
+        availability_dict = {}
+        day_entries = availability_str.split(";")
+        if availability_str:
+            try:
+                for entry in day_entries:
+                    if ":" in entry:
+                        day, time_frames = entry.split(": ", 1)
+                        availability_dict[day.strip()] = time_frames.strip()
+            except ValueError:
+                print("Invalid availability format. Use 'day: time_frame'")
+        return availability_dict
+
+    @staticmethod
+    def read_json_data(filepath):
+        with open(filepath, 'r') as file:
+            return json.load(file)

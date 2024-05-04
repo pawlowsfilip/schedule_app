@@ -10,9 +10,14 @@ class ExcelExporter:
         data = []
         for day, time_frames in self.scheduler.items():
             for time_frame, workers in time_frames.items():
-                worker_names = ', '.join([worker.name for worker in workers]) if workers else "No worker"
+                if isinstance(workers[0], str):
+                    worker_names = workers[0]
+                else:
+                    worker_names = ', '.join([worker.name for worker in workers])
+
                 data.append({'Date': day, 'Time Frame': time_frame, 'Workers': worker_names})
-        return pd.DataFrame(data)
+
+            return pd.DataFrame(data)
 
     def pivot_schedule(self):
         df = self.schedule_to_dataframe()
@@ -20,6 +25,7 @@ class ExcelExporter:
         pivot_df = df.pivot(index='Time Frame', columns='Date', values='Workers')
         pivot_df.reset_index(inplace=True)
         pivot_df.columns.name = None  # Remove the hierarchy on the columns
+        print('Pivoted DataFrame:', pivot_df)
         return pivot_df
 
     def export_to_excel(self, filename='schedule_r.xlsx'):
@@ -65,3 +71,4 @@ class ExcelExporter:
             })
 
             worksheet.autofit()
+            print('schedule exported to {}'.format(filename))

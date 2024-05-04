@@ -16,6 +16,7 @@ class Gui:
     def export_schedule(self):
         print('making schedule')
         schedule = self.make_schedule()
+        print('Schedule data:', schedule)
         return ExcelExporter(schedule).export_to_excel()
 
     def update_day(self, day):
@@ -57,28 +58,27 @@ class Gui:
 
     def update_scheduler_from_json(self, filepath):
         data = self.read_json_data(filepath)
-
         allocation = {}
         workers = []
+
         for entry in data:
-            if "day" in entry and "time_frames" in entry:
-                # Process allocation data
+            if "time_frames" in entry:
                 time_frames_str = entry["time_frames"]
-                allocation.update({
-                    tf.split(": ")[0]: int(tf.split(": ")[1])
-                    for tf in time_frames_str.split(", ")
-                })
+                time_frame_list = [tf.strip() for tf in time_frames_str.split(",")]
+
+                for tf in time_frame_list:
+                    time_frame, workers_needed = map(str.strip, tf.rsplit(":", 1))
+                    allocation[time_frame] = int(workers_needed)
+
+
             elif "name" in entry:
-                # Create worker objects and add to list
                 workers.append(Worker(
                     name=entry["name"],
                     availability=entry["availability"],
                     worse_availability=entry["worse_availability"]
                 ))
 
-        # Update allocation in the scheduler
         self.update_allocation(allocation)
-        # Update workers in the worker manager
         self.update_workers(workers)
 
     def print_scheduler_data(self):
