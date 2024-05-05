@@ -16,10 +16,16 @@ class Scheduler_s(Scheduler):
         self.schedule = {}
 
     def _get_time_frames_list(self):
-        return list(self.allocation.keys())
+        time_frames = set()
+        for day_time_frames in self.allocation.values():
+            for time_frame in day_time_frames:
+                time_frames.add(time_frame)
+        return list(time_frames)
 
-    def get_needed_workers_for_time_frame(self, current_time_frame):
-        return self.allocation.get(current_time_frame, None)
+    def get_needed_workers_for_time_frame(self, day, current_time_frame):
+        if day in self.allocation and current_time_frame in self.allocation[day]:
+            return self.allocation[day][current_time_frame]
+        return None
 
     def _get_previous_time_frame_worker(self, current_day, current_time_frame):
         sorted_time_frames = self._get_time_frames_list()  # This needs to return time frames in sorted order
@@ -74,14 +80,14 @@ class Scheduler_s(Scheduler):
 
     def make_schedule(self):
         days = self.worker_manager.get_days()
-        time_frames = self._get_time_frames_list()
         self.schedule = {day: {} for day in days}
 
         for day in days:
+            time_frames = self.allocation[day].keys()
             day_schedule = {}  # This will hold all time frame dictionaries for the current day
 
             for time_frame in time_frames:
-                needed_workers = self.get_needed_workers_for_time_frame(time_frame)
+                needed_workers = self.get_needed_workers_for_time_frame(day, time_frame)
                 workers_for_time_frame = []  # This will collect workers for the current time frame
 
                 if needed_workers == 0:

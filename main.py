@@ -62,14 +62,17 @@ class Gui:
         workers = []
 
         for entry in data:
+            day = entry.get("day")
             if "time_frames" in entry:
                 time_frames_str = entry["time_frames"]
-                time_frame_list = [tf.strip() for tf in time_frames_str.split(",")]
+                time_frames_list = [tf.strip() for tf in time_frames_str.split(";")]
 
-                for tf in time_frame_list:
-                    time_frame, workers_needed = map(str.strip, tf.rsplit(":", 1))
-                    allocation[time_frame] = int(workers_needed)
+                if day not in allocation:
+                    allocation[day] = {}
 
+                for tf in time_frames_list:
+                    time_frame, workers_needed = map(str.strip, tf.rsplit(": ", 1))
+                    allocation[day][time_frame] = int(workers_needed)
 
             elif "name" in entry:
                 workers.append(Worker(
