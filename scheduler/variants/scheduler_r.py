@@ -92,7 +92,7 @@ class Scheduler_r(Scheduler):
         else:
             return None
 
-    def get_needed_workers_for_time_frame(self, current_time_frame):
+    def get_needed_workers_for_time_frame(self, day, current_time_frame):
         if not current_time_frame:
             return None
         else:

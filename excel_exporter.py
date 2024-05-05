@@ -1,35 +1,52 @@
 import pandas as pd
 import xlsxwriter
-
+from datetime import datetime
 
 class ExcelExporter:
     def __init__(self, scheduler):
         self.scheduler = scheduler
 
+    @staticmethod
+    def parse_time_frame_key(time_frame):
+        start_str, _ = time_frame.split('-')
+        return datetime.strptime(start_str.strip(), '%H:%M')
+
+    @staticmethod
+    def parse_date(date_str):
+        return datetime.strptime(date_str.strip(), '%d.%m')
+
     def schedule_to_dataframe(self):
         data = []
+        sorted_data = []
+
         for day, time_frames in self.scheduler.items():
-            for time_frame, workers in time_frames.items():
-                if isinstance(workers[0], str):
-                    worker_names = workers[0]
-                else:
-                    worker_names = ', '.join([worker.name for worker in workers])
+            for time_frame in time_frames.keys():
+                sorted_data.append((day, time_frame))
 
-                data.append({'Date': day, 'Time Frame': time_frame, 'Workers': worker_names})
+        sorted_data.sort(key=lambda x: (self.parse_date(x[0]), self.parse_time_frame_key(x[1])))
 
-            return pd.DataFrame(data)
+        for day, time_frame in sorted_data:
+            workers = self.scheduler[day][time_frame]
+            worker_names = ', '.join([worker.name for worker in workers if hasattr(worker, 'name')]) or "No worker"
+            data.append({'Date': day, 'Time Frame': time_frame, 'Workers': worker_names})
+
+        return pd.DataFrame(data)
 
     def pivot_schedule(self):
         df = self.schedule_to_dataframe()
-        # Pivot the table
+        df['Date'] = pd.to_datetime(df['Date'], format='%d.%m')
+        df.sort_values(by=['Date', 'Time Frame'], inplace=True)
+        df['Date'] = df['Date'].dt.strftime('%d.%m')
+
         pivot_df = df.pivot(index='Time Frame', columns='Date', values='Workers')
         pivot_df.reset_index(inplace=True)
-        pivot_df.columns.name = None  # Remove the hierarchy on the columns
+        pivot_df.columns.name = None
         print('Pivoted DataFrame:', pivot_df)
         return pivot_df
 
-    def export_to_excel(self, filename='schedule_r.xlsx'):
-        df = self.pivot_schedule()  # Use the pivoted DataFrame
+    def export_to_excel(self, filename='schedule.xlsx'):
+        df = self.pivot_schedule()
+        df.fillna('', inplace=True)  # Replace NaN with empty string
         with pd.ExcelWriter(filename, engine='xlsxwriter') as writer:
             df.to_excel(writer, index=False, sheet_name='Schedule')
 

@@ -42,7 +42,7 @@ class Scheduler(ABC):
         pass
 
     @abstractmethod
-    def get_needed_workers_for_time_frame(self, current_time_frame):
+    def get_needed_workers_for_time_frame(self, day, current_time_frame):
         pass
 
     @staticmethod
