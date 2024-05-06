@@ -38,10 +38,15 @@ class ExcelExporter:
         df.sort_values(by=['Date', 'Time Frame'], inplace=True)
         df['Date'] = df['Date'].dt.strftime('%d.%m')
 
+        time_frames_ordered = sorted(df['Time Frame'].unique(), key=lambda x: self.parse_time_frame_key(x))
+
         pivot_df = df.pivot(index='Time Frame', columns='Date', values='Workers')
+
+        pivot_df = pivot_df.reindex(index=time_frames_ordered)
         pivot_df.reset_index(inplace=True)
         pivot_df.columns.name = None
-        print('Pivoted DataFrame:', pivot_df)
+
+        print('Pivoted DataFrame:\n', pivot_df)
         return pivot_df
 
     def export_to_excel(self, filename='schedule.xlsx'):
