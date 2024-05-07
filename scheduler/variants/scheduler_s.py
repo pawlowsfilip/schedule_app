@@ -1,6 +1,9 @@
 from scheduler.scheduler import Scheduler
 from datetime import datetime, time, timedelta
 
+def extract_start_time(time_frame):
+    start_str, _ = time_frame.split('-')
+    return datetime.strptime(start_str.strip(), '%H:%M')
 
 class Scheduler_s(Scheduler):
     """
@@ -20,7 +23,8 @@ class Scheduler_s(Scheduler):
         for day_time_frames in self.allocation.values():
             for time_frame in day_time_frames:
                 time_frames.add(time_frame)
-        return list(time_frames)
+
+        return sorted(list(time_frames), key=extract_start_time)
 
     def get_needed_workers_for_time_frame(self, day, current_time_frame):
         if day in self.allocation and current_time_frame in self.allocation[day]:
@@ -41,7 +45,7 @@ class Scheduler_s(Scheduler):
             if previous_time_frame in day_schedule:
                 previous_workers = day_schedule[previous_time_frame]
                 for worker in previous_workers:
-                    if worker == 'No worker available':
+                    if worker == 'NO WORKER' or worker == 'NO WORKER AVAILABLE':
                         continue
                     else:
                         if worker.is_available(current_day, current_time_frame):
@@ -122,7 +126,10 @@ class Scheduler_s(Scheduler):
                                 workers_for_time_frame.append(worker)
 
                     while len(workers_for_time_frame) < needed_workers:
-                        workers_for_time_frame.append("No worker available")
+                        workers_for_time_frame.append("NO WORKER")
+
+                if all(worker == "NO WORKER" for worker in workers_for_time_frame):
+                    workers_for_time_frame = ["NO WORKER AVAILABLE"]
 
                 day_schedule[time_frame] = workers_for_time_frame
 

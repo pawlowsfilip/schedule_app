@@ -81,7 +81,8 @@ class SchedulerSView(customtkinter.CTkFrame):
         tooltip = CTkToolTip(self.info_label, delay=0.5,
                              message="Time frames are specific period of time\n"
                                      "which needs to be filled by workers.\n"
-                                     "Ex. 8:00-8:15, 9:00-9:15, etc.",
+                                     "Time frames need to be separated by ';'\n"
+                                     "Ex. 8:00-8:15; 9:00-9:15 etc.",
                              font=("Inter", 13),
                              alpha=0.9,
                              corner_radius=12,
@@ -183,11 +184,13 @@ class SchedulerSView(customtkinter.CTkFrame):
         tooltip = CTkToolTip(self.info_label, delay=0.5,
                              message="Name is the name of the worker.\n\n"
                                      "Availability is daily availability of the worker.\n"
-                                     'Ex. 21:07: [7:00-10:00, 14:00-15:00],\n22.07: [8:00-15:00]\n\n'
+                                     "Time frames must to be separated by ','\n"
+                                     "Days must be separated by ';'\n"
+                                     'Ex. 21.07: 8:00-8:30, 10:00-11:00; 22.07: 7:00-8:00\n\n'
                                      'Worse availability is daily availability of the worker,\n'
                                      'but optional. If there is possibility to not come to work,\n'
                                      'worker would rather not come.\n'
-                                     'Ex. 21:07: [7:00-10:00, 14:00-15:00],\n22.07: [8:00-15:00]',
+                                     'Ex. 21.07: 12:00-13:00; 22.07: 8:00-8:30',
                              font=("Inter", 13),
                              alpha=0.9,
                              corner_radius=12,
