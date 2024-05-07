@@ -27,7 +27,7 @@ class ExcelExporter:
 
         for day, time_frame in sorted_data:
             workers = self.scheduler[day][time_frame]
-            worker_names = ', '.join([worker.name for worker in workers if hasattr(worker, 'name')]) or "No worker"
+            worker_names = ', '.join([worker if isinstance(worker, str) else worker.name for worker in workers])
             data.append({'Date': day, 'Time Frame': time_frame, 'Workers': worker_names})
 
         return pd.DataFrame(data)
@@ -85,8 +85,36 @@ class ExcelExporter:
                     cell_value = df.iloc[row_num - 1, col_num]
                     worksheet.write(row_num, col_num, cell_value, cell_format)
 
-            # Setting bold border for whole table
             last_row, last_col = len(df), len(df.columns) - 1
+
+            worksheet.conditional_format(1, 0, last_row, last_col, {
+                'type': 'cell',
+                'criteria': 'equal to',
+                'value': '"NO WORKER AVAILABLE"',
+                'format': workbook.add_format({'font_color': 'red'})
+            })
+
+            worksheet.conditional_format(1, 0, last_row, last_col, {
+                'type': 'text',
+                'criteria': 'containing',
+                'value': 'NO WORKER',
+                'format': workbook.add_format({'font_color': '#b08c09'})
+            })
+
+            worksheet.conditional_format(1, 0, last_row, last_col, {
+                'type': 'text',
+                'criteria': 'containing',
+                'value': '-',
+                'format': workbook.add_format({'font_color': 'black'})
+            })
+
+            worksheet.conditional_format(1, 0, last_row, last_col, {
+                'type': 'text',
+                'criteria': 'not containing',
+                'value': 'NO WORKER',
+                'format': workbook.add_format({'font_color': 'green'})
+            })
+
             worksheet.conditional_format(0, 0, last_row, last_col, {
                 'type': 'no_errors',
                 'format': bold_border_format
