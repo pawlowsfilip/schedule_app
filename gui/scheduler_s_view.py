@@ -121,6 +121,7 @@ class SchedulerSView(customtkinter.CTkFrame):
         self.time_frames.place(relx=0.15,
                                rely=0.34,
                                anchor=customtkinter.W)
+
         self.time_frames_entry = customtkinter.CTkEntry(self.l_frame,
                                                         placeholder_text='Type here...',
                                                         border_color="#2b2b2b",

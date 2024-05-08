@@ -1,15 +1,19 @@
 import customtkinter
 from CTkToolTip import *
 from PIL import Image
+from database.database import read_json, write_json
+import json
 
 
 class SchedulerRView(customtkinter.CTkFrame):
     """ Frame for the 'Scheduler_R' option within the main application window. """
+    DATABASE_PATH = r"C:\Users\Filip\PycharmProjects\ScheduleApp\database\database.json"
 
     def __init__(self, parent, gui):
         super().__init__(parent, fg_color='transparent')
         self.parent = parent
         self.gui = gui
+        self.clear_database()
         self.pack(fill="both", expand=True)
         self.create_view()
 
@@ -85,6 +89,28 @@ class SchedulerRView(customtkinter.CTkFrame):
                              text_color='#f2f2f2',
                              padding=(10, 10))
 
+        # day
+        self.day = customtkinter.CTkLabel(self.l_frame, text="Day",
+                                          font=("Inter", 18),
+                                          fg_color="#333333",
+                                          text_color="#f2f2f2",
+                                          justify="left",
+                                          anchor='w')
+        self.day.place(relx=0.15,
+                       rely=0.175,
+                       anchor=customtkinter.W)
+        self.day_entry = customtkinter.CTkEntry(self.l_frame,
+                                                placeholder_text='Type here...',
+                                                border_color="#2b2b2b",
+                                                width=250,
+                                                height=40,
+                                                fg_color="#2b2b2b",
+                                                text_color="#f2f2f2",
+                                                font=("Inter", 14))
+        self.day_entry.place(relx=0.5,
+                             rely=0.25,
+                             anchor=customtkinter.CENTER)
+
         # Accuracy
         self.accuracy = customtkinter.CTkLabel(self.l_frame, text="Accuracy",
                                                font=("Inter", 18),
@@ -93,7 +119,7 @@ class SchedulerRView(customtkinter.CTkFrame):
                                                justify="left",
                                                anchor='w')
         self.accuracy.place(relx=0.15,
-                            rely=0.175,
+                            rely=0.34,
                             anchor=customtkinter.W)
         self.accuracy_entry = customtkinter.CTkEntry(self.l_frame,
                                                      placeholder_text='Type here...',
@@ -104,7 +130,7 @@ class SchedulerRView(customtkinter.CTkFrame):
                                                      text_color="#f2f2f2",
                                                      font=("Inter", 14))
         self.accuracy_entry.place(relx=0.5,
-                                  rely=0.25,
+                                  rely=0.42,
                                   anchor=customtkinter.CENTER)
         self.accuracy_entry.bind("<Return>", self.submit_accuracy)
 
@@ -117,7 +143,7 @@ class SchedulerRView(customtkinter.CTkFrame):
                                                  anchor='w')
 
         self.allocation.place(relx=0.15,
-                              rely=0.34,
+                              rely=0.50,
                               anchor=customtkinter.W)
 
         self.allocation_entry = customtkinter.CTkEntry(self.l_frame,
@@ -130,9 +156,23 @@ class SchedulerRView(customtkinter.CTkFrame):
                                                        font=("Inter", 14))
 
         self.allocation_entry.place(relx=0.5,
-                                    rely=0.42,
+                                    rely=0.58,
                                     anchor=customtkinter.CENTER)
         self.allocation_entry.bind("<Return>", self.submit_allocation)
+
+        self.add_day_time_frame = customtkinter.CTkButton(self.l_frame, text="Add",
+                                                       width=75,
+                                                       height=40,
+                                                       fg_color="#f2f2f2",
+                                                       text_color="#333333",
+                                                       corner_radius=50,
+                                                       hover_color='#a1a1a1',
+                                                       font=("Inter", 14, 'bold'),
+                                                       command=self.submit_day_time_frame)
+
+        self.add_day_time_frame.place(relx=0.5,
+                                   rely=0.85,
+                                   anchor=customtkinter.CENTER)
 
         # mid Frame
         self.m_frame = customtkinter.CTkLabel(self, text='',
@@ -285,6 +325,20 @@ class SchedulerRView(customtkinter.CTkFrame):
                                   anchor=customtkinter.CENTER)
         self.position_entry.bind("<Return>", self.submit_position)
 
+        self.add_properties_button = customtkinter.CTkButton(self.m_frame, text="Add",
+                                                             width=75,
+                                                             height=40,
+                                                             fg_color="#f2f2f2",
+                                                             text_color="#333333",
+                                                             corner_radius=50,
+                                                             hover_color='#a1a1a1',
+                                                             font=("Inter", 14, 'bold'),
+                                                             command=self.submit_worker_info)
+
+        self.add_properties_button.place(relx=0.5,
+                                         rely=0.85,
+                                         anchor=customtkinter.CENTER)
+
         # right Frame
         self.r_frame = customtkinter.CTkLabel(self, text='',
                                               width=540,
@@ -306,8 +360,8 @@ class SchedulerRView(customtkinter.CTkFrame):
                         rely=0.10,
                         anchor=customtkinter.W)
 
-        # showing data
-        self.setup_display_areas()
+        # # showing data
+        # self.setup_display_areas()
 
         # export_button
         self.export_button = customtkinter.CTkButton(self, text="Export",
@@ -324,61 +378,58 @@ class SchedulerRView(customtkinter.CTkFrame):
                                  rely=0.85,
                                  anchor=customtkinter.CENTER)
 
-    def setup_display_areas(self):
-        # Labels to display data dynamically
-        self.display_accuracy = customtkinter.CTkLabel(self.r_frame, text="Accuracy: ", font=("Inter", 16), fg_color="#333333", text_color="#f2f2f2", width=500, height=40, anchor='w')
-        self.display_accuracy.place(relx=0.1, rely=0.2, anchor=customtkinter.W)
+    def submit_day_time_frame(self):
+        day_value = self.day_entry.get()
+        accuracy_value = self.accuracy_entry.get()
+        allocation_value = self.allocation_entry.get()
+        if day_value and accuracy_value and allocation_value:
+            properties = {
+                'day': day_value,
+                'accuracy': accuracy_value,
+                'allocation': allocation_value
+            }
+            self.update_database([properties])
+            self.load_scheduler_data()
+            # self.update_display_areas()
 
-        self.display_allocation = customtkinter.CTkLabel(self.r_frame, text="Allocation: ", font=("Inter", 16), fg_color="#333333", text_color="#f2f2f2", width=500, height=40, anchor='w')
-        self.display_allocation.place(relx=0.1, rely=0.3, anchor=customtkinter.W)
+    def submit_worker_info(self):
+        pass
 
-        self.display_name = customtkinter.CTkLabel(self.r_frame, text="Name", font=("Inter: ", 16), fg_color="#333333", text_color="#f2f2f2", width=500, height=40, anchor='w')
-        self.display_name.place(relx=0.1, rely=0.4, anchor=customtkinter.W)
+    def update_database(self, new_entries):
+        try:
+            with open(self.DATABASE_PATH, 'r') as file:
+                data = json.load(file)
+        except (FileNotFoundError, json.JSONDecodeError):
+            data = []
 
-        self.display_availability = customtkinter.CTkLabel(self.r_frame, text="Availability: ", font=("Inter", 16), fg_color="#333333", text_color="#f2f2f2", width=500, height=40, anchor='w')
-        self.display_availability.place(relx=0.1, rely=0.5, anchor=customtkinter.W)
+        data.extend(new_entries)
 
-        self.display_worse_availability = customtkinter.CTkLabel(self.r_frame, text="Worse availability: ", font=("Inter", 16), fg_color="#333333", text_color="#f2f2f2", width=500, height=40, anchor='w')
-        self.display_worse_availability.place(relx=0.1, rely=0.6, anchor=customtkinter.W)
+        with open(self.DATABASE_PATH, 'w') as file:
+            json.dump(data, file, indent=4)
 
-        self.display_position = customtkinter.CTkLabel(self.r_frame, text="Position", font=("Inter: ", 16), fg_color="#333333", text_color="#f2f2f2", width=500, height=40, anchor='w')
-        self.display_position.place(relx=0.1, rely=0.7, anchor=customtkinter.W)
+    def load_scheduler_data(self):
+        if self.gui:
+            self.gui.update_scheduler_from_json(self.DATABASE_PATH)
+        else:
+            print("GUI not initialized.")
+
+    def clear_database(self):
+        write_json(self.DATABASE_PATH, [])
 
     def submit_accuracy(self, event):
-        accuracy_value = self.accuracy_entry.get()
-        if accuracy_value:
-            self.display_accuracy.configure(text=f"Accuracy: {accuracy_value}")
-            self.parent.update_scheduler_parameters({'accuracy': accuracy_value})
+        pass
 
     def submit_allocation(self, event):
-        allocation_value = self.allocation_entry.get()
-        if allocation_value:
-            self.display_allocation.configure(text=f"Allocation: {allocation_value}")
-            self.parent.update_scheduler_parameters({'allocation': allocation_value})
+        pass
 
     def submit_name(self, event):
-        name_value = self.name_entry.get()
-        if name_value:
-            self.display_name.configure(text=f"Name: {name_value}")
-            self.parent.update_scheduler_parameters({'name': name_value})
+        pass
 
     def submit_availability(self, event):
-        availability_value = self.availability_entry.get()
-        if availability_value:
-            self.display_availability.configure(text=f"Availability: {availability_value}")
-            self.parent.update_scheduler_parameters({'availability': availability_value})
+        pass
 
     def submit_worse_availability(self, event):
-        worse_availability_value = self.worse_availability_entry.get()
-        if worse_availability_value:
-            self.display_worse_availability.configure(text=f"Worse availability: {worse_availability_value}")
-            self.parent.update_scheduler_parameters({'worse_availability': worse_availability_value})
+        pass
 
     def submit_position(self, event):
-        position_value = self.position_entry.get()
-        if position_value:
-            self.display_position.configure(text=f"Position: {position_value}")
-            self.parent.update_scheduler_parameters({'position': position_value})
-
-    def export_scheduler(self):
         pass
