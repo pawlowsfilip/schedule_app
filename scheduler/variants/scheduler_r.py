@@ -31,16 +31,22 @@ class Scheduler_r(Scheduler):
         """
         earliest_start = None
         latest_end = None
+        print(self.allocation)
+        print(self.allocation.keys())
 
-        for time_range in self.allocation.keys():
-            start_str, end_str = time_range.split("-")
-            start_time = self._parse_time(start_str)
-            end_time = self._parse_time(end_str)
+        for day, time_ranges in self.allocation.items():
+            for time_range in time_ranges.keys():
+                try:
+                    start_str, end_str = time_range.split("-")
+                    start_time = self._parse_time(start_str.strip())
+                    end_time = self._parse_time(end_str.strip())
 
-            if earliest_start is None or start_time < earliest_start:
-                earliest_start = start_time
-            if latest_end is None or end_time > latest_end:
-                latest_end = end_time
+                    if earliest_start is None or start_time < earliest_start:
+                        earliest_start = start_time
+                    if latest_end is None or end_time > latest_end:
+                        latest_end = end_time
+                except ValueError:
+                    print(f"Invalid time range: {time_range}")
 
         earliest_start_str = earliest_start.strftime('%H:%M') if earliest_start else None
         latest_end_str = latest_end.strftime('%H:%M') if latest_end else None
@@ -101,12 +107,13 @@ class Scheduler_r(Scheduler):
             current_end = self._parse_time(current_end_str)
 
             for time_range, workers_needed in self.allocation.items():
-                start_str, end_str = time_range.split('-')
-                start_time = self._parse_time(start_str)
-                end_time = self._parse_time(end_str)
+                for time_frame in workers_needed.keys():
+                    start_str, end_str = time_frame.split('-')
+                    start_time = self._parse_time(start_str)
+                    end_time = self._parse_time(end_str)
 
-                if (start_time <= current_start < end_time) or (start_time < current_end <= end_time):
-                    return workers_needed
+                    if (start_time <= current_start < end_time) or (start_time < current_end <= end_time):
+                        return workers_needed
 
     def _get_least_used_workers(self):
         """
@@ -160,7 +167,7 @@ class Scheduler_r(Scheduler):
 
         for day in days:
             for time_frame in time_frames:
-                needed_workers = self.get_needed_workers_for_time_frame(time_frame)
+                needed_workers = self.get_needed_workers_for_time_frame(day, time_frame)
 
                 if needed_workers == 0:
                     continue  # Skip if no workers are needed for this time frame
