@@ -371,7 +371,7 @@ class SchedulerSView(customtkinter.CTkFrame):
 
     def load_scheduler_data(self):
         if self.gui:
-            self.gui.update_scheduler_from_json(self.DATABASE_PATH)
+            self.gui.update_scheduler_s_from_json(self.DATABASE_PATH)
         else:
             print("GUI not initialized.")
 

@@ -56,7 +56,7 @@ class Gui:
         with open(filepath, 'r') as file:
             return json.load(file)
 
-    def update_scheduler_from_json(self, filepath):
+    def update_scheduler_s_from_json(self, filepath):
         data = self.read_json_data(filepath)
         allocation = {}
         workers = []
@@ -81,6 +81,38 @@ class Gui:
                     worse_availability=entry["worse_availability"]
                 ))
 
+        self.update_allocation(allocation)
+        self.update_workers(workers)
+
+    def update_scheduler_r_from_json(self, filepath):
+        data = self.read_json_data(filepath)
+        allocation = {}
+        accuracy = 1.0  # Default accuracy
+        workers = []
+
+        for entry in data:
+            if "day" in entry and "accuracy" in entry:
+                day = entry["day"]
+                accuracy = float(entry["accuracy"])
+                allocation_str = entry["allocation"]
+                time_frames = [tf.strip() for tf in allocation_str.split(";")]
+
+                if day not in allocation:
+                    allocation[day] = {}
+
+                for tf in time_frames:
+                    time_frame, workers_needed = map(str.strip, tf.split(": "))
+                    allocation[day][time_frame] = int(workers_needed)
+
+            elif "name" in entry:
+                workers.append(Worker(
+                    name=entry["name"],
+                    availability=entry["availability"],
+                    worse_availability=entry["worse_availability"],
+                    position=entry.get("position", "")
+                ))
+
+        self.update_accuracy(accuracy)
         self.update_allocation(allocation)
         self.update_workers(workers)
 

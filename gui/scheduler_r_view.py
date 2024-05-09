@@ -132,7 +132,6 @@ class SchedulerRView(customtkinter.CTkFrame):
         self.accuracy_entry.place(relx=0.5,
                                   rely=0.42,
                                   anchor=customtkinter.CENTER)
-        self.accuracy_entry.bind("<Return>", self.submit_accuracy)
 
         # Allocation
         self.allocation = customtkinter.CTkLabel(self.l_frame, text="Allocation",
@@ -158,7 +157,6 @@ class SchedulerRView(customtkinter.CTkFrame):
         self.allocation_entry.place(relx=0.5,
                                     rely=0.58,
                                     anchor=customtkinter.CENTER)
-        self.allocation_entry.bind("<Return>", self.submit_allocation)
 
         self.add_day_time_frame = customtkinter.CTkButton(self.l_frame, text="Add",
                                                        width=75,
@@ -245,7 +243,6 @@ class SchedulerRView(customtkinter.CTkFrame):
         self.name_entry.place(relx=0.5,
                               rely=0.25,
                               anchor=customtkinter.CENTER)
-        self.name_entry.bind("<Return>", self.submit_name)
 
         # availability
         self.availability = customtkinter.CTkLabel(self.m_frame, text="Availability",
@@ -271,7 +268,6 @@ class SchedulerRView(customtkinter.CTkFrame):
         self.availability_entry.place(relx=0.5,
                                       rely=0.42,
                                       anchor=customtkinter.CENTER)
-        self.availability_entry.bind("<Return>", self.submit_availability)
 
         # worse_availability
         self.worse_availability = customtkinter.CTkLabel(self.m_frame, text="Worse availability",
@@ -297,7 +293,6 @@ class SchedulerRView(customtkinter.CTkFrame):
         self.worse_availability_entry.place(relx=0.5,
                                             rely=0.58,
                                             anchor=customtkinter.CENTER)
-        self.worse_availability_entry.bind("<Return>", self.submit_worse_availability)
 
         # position
         self.position = customtkinter.CTkLabel(self.m_frame, text="Position",
@@ -323,7 +318,6 @@ class SchedulerRView(customtkinter.CTkFrame):
         self.position_entry.place(relx=0.5,
                                   rely=0.74,
                                   anchor=customtkinter.CENTER)
-        self.position_entry.bind("<Return>", self.submit_position)
 
         self.add_properties_button = customtkinter.CTkButton(self.m_frame, text="Add",
                                                              width=75,
@@ -380,8 +374,9 @@ class SchedulerRView(customtkinter.CTkFrame):
 
     def submit_day_time_frame(self):
         day_value = self.day_entry.get()
-        accuracy_value = self.accuracy_entry.get()
+        accuracy_value = float(self.accuracy_entry.get())
         allocation_value = self.allocation_entry.get()
+
         if day_value and accuracy_value and allocation_value:
             properties = {
                 'day': day_value,
@@ -393,7 +388,24 @@ class SchedulerRView(customtkinter.CTkFrame):
             # self.update_display_areas()
 
     def submit_worker_info(self):
-        pass
+        name_value = self.name_entry.get()
+        availability_value = self.availability_entry.get()
+        worse_availability_value = self.worse_availability_entry.get()
+        position_value = self.position_entry.get()
+
+        # Convert the availability values into dictionaries using separate functions
+        availability_dict = self.parse_availability(availability_value)
+        worse_availability_dict = self.parse_availability(worse_availability_value)
+
+        if name_value and availability_dict:
+            worker_info = {
+                'name': name_value,
+                'availability': availability_dict,
+                'worse_availability': worse_availability_dict,
+                'position': position_value
+            }
+            self.update_database([worker_info])
+            self.load_scheduler_data()
 
     def update_database(self, new_entries):
         try:
@@ -409,27 +421,23 @@ class SchedulerRView(customtkinter.CTkFrame):
 
     def load_scheduler_data(self):
         if self.gui:
-            self.gui.update_scheduler_from_json(self.DATABASE_PATH)
+            self.gui.update_scheduler_r_from_json(self.DATABASE_PATH)
         else:
             print("GUI not initialized.")
 
     def clear_database(self):
         write_json(self.DATABASE_PATH, [])
 
-    def submit_accuracy(self, event):
-        pass
-
-    def submit_allocation(self, event):
-        pass
-
-    def submit_name(self, event):
-        pass
-
-    def submit_availability(self, event):
-        pass
-
-    def submit_worse_availability(self, event):
-        pass
-
-    def submit_position(self, event):
-        pass
+    @staticmethod
+    def parse_availability(availability_str):
+        availability_dict = {}
+        day_entries = availability_str.split(";")
+        if availability_str:
+            try:
+                for entry in day_entries:
+                    if ":" in entry:
+                        day, time_frames = entry.split(": ", 1)
+                        availability_dict[day.strip()] = time_frames.strip()
+            except ValueError:
+                print("Invalid availability format. Use 'day: time_frame'")
+        return availability_dict
