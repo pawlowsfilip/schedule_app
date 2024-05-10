@@ -47,8 +47,9 @@ class Gui:
         self.scheduler.position = position
         print("Position updated to:", position)
 
-    def update_workers(self, workers):
+    def update_workers(self, workers, position_priorities):
         self.scheduler.worker_manager = Worker_Manager(*workers)
+        self.scheduler.worker_manager.set_position_priorities(position_priorities)
         print("Workers updated")
 
     @staticmethod
@@ -89,6 +90,7 @@ class Gui:
         allocation = {}
         accuracy = 1.0  # Default accuracy
         workers = []
+        position_priorities = {}
 
         for entry in data:
             if "day" in entry and "accuracy" in entry:
@@ -112,9 +114,12 @@ class Gui:
                     position=entry.get("position", "")
                 ))
 
+            elif "position_priorities" in entry:
+                position_priorities = entry["position_priorities"]
+
         self.update_accuracy(accuracy)
         self.update_allocation(allocation)
-        self.update_workers(workers)
+        self.update_workers(workers, position_priorities)
 
     def print_scheduler_data(self):
         print("Allocation:", self.scheduler.allocation)
