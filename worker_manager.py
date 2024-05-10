@@ -29,7 +29,11 @@ class Worker_Manager:
 
         :param priorities: Dict[str, int]
         """
-        self.position_priorities = priorities
+        if self.position_priorities:
+            self.position_priorities = priorities
+            return self.position_priorities
+        else:
+            return self.workers_list
 
     def _get_position_priority(self, position):
         """
@@ -52,7 +56,7 @@ class Worker_Manager:
             # Sort workers based on the position priority, then by name or another attribute for consistency.
             return sorted(self.workers_list, key=lambda worker: self._get_position_priority(worker.position))
         else:
-            pass
+            return self.workers_list
 
     def get_available_workers(self, day, time_frame):
         available_workers = []

@@ -158,6 +158,31 @@ class SchedulerRView(customtkinter.CTkFrame):
                                     rely=0.58,
                                     anchor=customtkinter.CENTER)
 
+        # position
+        self.position_priorities = customtkinter.CTkLabel(self.l_frame, text="Position priorities",
+                                               font=("Inter", 18),
+                                               fg_color="#333333",
+                                               text_color="#f2f2f2",
+                                               justify="left",
+                                               anchor='w')
+
+        self.position_priorities.place(relx=0.15,
+                            rely=0.66,
+                            anchor=customtkinter.W)
+
+        self.position_priorities_entry = customtkinter.CTkEntry(self.l_frame,
+                                                     placeholder_text='Type here...',
+                                                     border_color="#2b2b2b",
+                                                     width=250,
+                                                     height=40,
+                                                     fg_color="#2b2b2b",
+                                                     text_color="#f2f2f2",
+                                                     font=("Inter", 14))
+
+        self.position_priorities_entry.place(relx=0.5,
+                                  rely=0.74,
+                                  anchor=customtkinter.CENTER)
+
         self.add_day_time_frame = customtkinter.CTkButton(self.l_frame, text="Add",
                                                        width=75,
                                                        height=40,
@@ -376,13 +401,24 @@ class SchedulerRView(customtkinter.CTkFrame):
         day_value = self.day_entry.get()
         accuracy_value = float(self.accuracy_entry.get())
         allocation_value = self.allocation_entry.get()
+        position_priorities_value = self.position_priorities_entry.get()
 
         if day_value and accuracy_value and allocation_value:
-            properties = {
-                'day': day_value,
-                'accuracy': accuracy_value,
-                'allocation': allocation_value
-            }
+            if position_priorities_value:
+                properties = {
+                    'day': day_value,
+                    'accuracy': accuracy_value,
+                    'allocation': allocation_value,
+                    'position_priorities': position_priorities_value
+                }
+            else:
+                properties = {
+                    'day': day_value,
+                    'accuracy': accuracy_value,
+                    'allocation': allocation_value,
+                    'position_priorities': ""
+                }
+
             self.update_database([properties])
             self.load_scheduler_data()
             # self.update_display_areas()
