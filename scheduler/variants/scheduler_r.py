@@ -99,7 +99,7 @@ class Scheduler_r(Scheduler):
 
     def get_needed_workers_for_time_frame(self, day, current_time_frame):
         if not current_time_frame:
-            return None
+            return 0
 
         current_start_str, current_end_str = current_time_frame.split('-')
         current_start = self._parse_time(current_start_str)
@@ -113,6 +113,8 @@ class Scheduler_r(Scheduler):
 
                 if (start_time <= current_start < end_time) or (start_time < current_end <= end_time):
                     return workers_needed
+
+        return 0
 
     def _get_least_used_workers(self):
         """
@@ -169,6 +171,7 @@ class Scheduler_r(Scheduler):
 
         for day in days:
             for time_frame in time_frames:
+                print('time frame', time_frame)
                 needed_workers = self.get_needed_workers_for_time_frame(day, time_frame)
 
                 if needed_workers == 0:
