@@ -1,6 +1,5 @@
 from worker_manager import Worker_Manager
-from worker import Worker
-from datetime import datetime, timedelta
+from datetime import datetime
 from abc import ABC, abstractmethod
 
 
