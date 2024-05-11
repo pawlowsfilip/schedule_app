@@ -1,7 +1,4 @@
 import customtkinter
-from gui.scheduler_r_view import SchedulerRView
-from gui.scheduler_s_view import SchedulerSView
-
 
 class DefaultView(customtkinter.CTkFrame):
     def __init__(self, parent):

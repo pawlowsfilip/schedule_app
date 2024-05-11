@@ -1,7 +1,7 @@
 import customtkinter
-from PIL import Image
 from CTkToolTip import *
-from database.database import read_json, write_json
+from PIL import Image
+from database.database import write_json
 import json
 
 
