@@ -1,24 +1,21 @@
 from worker_manager import Worker_Manager
 from datetime import datetime
 from abc import ABC, abstractmethod
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class Scheduler(ABC):
     def __init__(self, variant):
-        # """
-        # For testing
-        # """
-        # worker1 = Worker('Filip', {'21.07': '8:00-10:00'}, {'21.07': '7:00-10:00'}, 'Manager')
-        # worker2 = Worker('Natalia', {'21.07': '8:00-10:00'}, {}, 'Regular')
-        # worker3 = Worker('Ola', {'21.07': '8:00-9:00'}, {'21.07': '10:00-14:00'}, 'Student')
-        # worker4 = Worker('Kondziu', {'21.07': '10:00-14:00'}, {'21.07': '10:00-14:00'}, 'Student')
-        # wm1 = Worker_Manager(worker1, worker2, worker3, worker4)
-        # wm1.set_position_priorities({'Manager': 1, 'Regular': 2, "Student": 3})
-        # self.worker_manager = wm1
-
-        self.variant = variant
-        self.schedule = {}
-        self.worker_manager = Worker_Manager()
+        try:
+            self.variant = variant
+            self.schedule = {}
+            self.worker_manager = Worker_Manager()
+            logger.debug(f"Scheduler initialized with variant {variant}")
+        except Exception as e:
+            logger.error(f"Error during initialization of Scheduler: {e}")
+            raise
 
     @abstractmethod
     def _get_previous_time_frame_worker(self, current_day, current_time_frame):
@@ -46,4 +43,10 @@ class Scheduler(ABC):
 
     @staticmethod
     def _parse_time(time_str):
-        return datetime.strptime(time_str, "%H:%M").time()
+        try:
+            time_obj = datetime.strptime(time_str, "%H:%M").time()
+            logger.debug(f"Parsed time string {time_str} into time object {time_obj}")
+            return time_obj
+        except ValueError as e:
+            logger.error(f"Error parsing time string {time_str}: {e}")
+            raise
