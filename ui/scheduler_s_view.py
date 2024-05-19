@@ -1,5 +1,6 @@
 import customtkinter
 from CTkToolTip import *
+from CTkXYFrame import *
 from PIL import Image
 from database.database import write_json
 import json
@@ -135,18 +136,18 @@ class SchedulerSView(customtkinter.CTkFrame):
                                      anchor=customtkinter.CENTER)
 
         self.add_day_time_frame = customtkinter.CTkButton(self.l_frame, text="Add",
-                                                       width=75,
-                                                       height=40,
-                                                       fg_color="#f2f2f2",
-                                                       text_color="#333333",
-                                                       corner_radius=50,
-                                                       hover_color='#a1a1a1',
-                                                       font=("Inter", 14, 'bold'),
-                                                       command=self.submit_day_time_frame)
+                                                          width=75,
+                                                          height=40,
+                                                          fg_color="#f2f2f2",
+                                                          text_color="#333333",
+                                                          corner_radius=50,
+                                                          hover_color='#a1a1a1',
+                                                          font=("Inter", 14, 'bold'),
+                                                          command=self.submit_day_time_frame)
 
         self.add_day_time_frame.place(relx=0.5,
-                                   rely=0.85,
-                                   anchor=customtkinter.CENTER)
+                                      rely=0.85,
+                                      anchor=customtkinter.CENTER)
 
         # mid Frame
         self.m_frame = customtkinter.CTkLabel(self, text='',
@@ -219,7 +220,6 @@ class SchedulerSView(customtkinter.CTkFrame):
         self.name_entry.place(relx=0.5,
                               rely=0.25,
                               anchor=customtkinter.CENTER)
-        # self.name_entry.bind("<Return>", self.submit_name)
 
         # availability
         self.availability = customtkinter.CTkLabel(self.m_frame, text="Availability",
@@ -245,7 +245,6 @@ class SchedulerSView(customtkinter.CTkFrame):
         self.availability_entry.place(relx=0.5,
                                       rely=0.42,
                                       anchor=customtkinter.CENTER)
-        # self.availability_entry.bind("<Return>", self.submit_availability)
 
         # worse_availability
         self.worse_availability = customtkinter.CTkLabel(self.m_frame, text="Worse availability",
@@ -271,7 +270,6 @@ class SchedulerSView(customtkinter.CTkFrame):
         self.worse_availability_entry.place(relx=0.5,
                                             rely=0.58,
                                             anchor=customtkinter.CENTER)
-        # self.worse_availability_entry.bind("<Return>", self.submit_worse_availability)
 
         self.add_properties_button = customtkinter.CTkButton(self.m_frame, text="Add",
                                                              width=75,
@@ -308,6 +306,9 @@ class SchedulerSView(customtkinter.CTkFrame):
         self.data.place(relx=0.15,
                         rely=0.10,
                         anchor=customtkinter.CENTER)
+
+        self.scrollable_frame_scheduler = CTkXYFrame(self.r_frame, width=440, height=300, fg_color="#2b2b2b")
+        self.scrollable_frame_scheduler.place(relx=0.085, rely=0.49, anchor=customtkinter.W)
 
         # showing data
         self.setup_display_areas()
@@ -379,20 +380,35 @@ class SchedulerSView(customtkinter.CTkFrame):
         write_json(self.DATABASE_PATH, [])
 
     def setup_display_areas(self):
-        self.display_accuracy = customtkinter.CTkLabel(self.r_frame, text="Day: ", font=("Inter", 16), fg_color="#333333", text_color="#f2f2f2", width=500, height=40, anchor='w')
-        self.display_accuracy.place(relx=0.1, rely=0.2, anchor=customtkinter.W)
+        pass
+        """
+        it should add something like an object of entry, because there can bne many days, so each day should be
+        appended
+        """
+        # self.display_accuracy = customtkinter.CTkLabel(self.scrollable_frame_scheduler, text="Day: ", font=("Inter", 16),
+        #                                                fg_color="#333333", text_color="#f2f2f2", width=500, height=40,
+        #                                                anchor='w')
+        # self.display_accuracy.grid(row=0, column=0, sticky='w', padx=0, pady=0)
 
-        self.display_allocation = customtkinter.CTkLabel(self.r_frame, text="Time frames: ", font=("Inter", 16), fg_color="#333333", text_color="#f2f2f2", width=500, height=40, anchor='w')
-        self.display_allocation.place(relx=0.1, rely=0.3, anchor=customtkinter.W)
+        # self.display_allocation = customtkinter.CTkLabel(self.scrollable_frame_scheduler, text="Time frames: ",
+        #                                                  font=("Inter", 16), fg_color="#333333", text_color="#f2f2f2",
+        #                                                  width=500, height=40, anchor='w')
+        # self.display_allocation.grid(row=1, column=0, sticky='w', padx=0, pady=0)
 
-        self.display_name = customtkinter.CTkLabel(self.r_frame, text="Name", font=("Inter: ", 16), fg_color="#333333", text_color="#f2f2f2", width=500, height=40, anchor='w')
-        self.display_name.place(relx=0.1, rely=0.4, anchor=customtkinter.W)
-
-        self.display_availability = customtkinter.CTkLabel(self.r_frame, text="Availability: ", font=("Inter", 16), fg_color="#333333", text_color="#f2f2f2", width=500, height=40, anchor='w')
-        self.display_availability.place(relx=0.1, rely=0.5, anchor=customtkinter.W)
-
-        self.display_worse_availability = customtkinter.CTkLabel(self.r_frame, text="Worse availability: ", font=("Inter", 16), fg_color="#333333", text_color="#f2f2f2", width=500, height=40, anchor='w')
-        self.display_worse_availability.place(relx=0.1, rely=0.6, anchor=customtkinter.W)
+        # self.display_name = customtkinter.CTkLabel(self.scrollable_frame_worker, text="Name", font=("Inter: ", 16),
+        #                                            fg_color="#333333", text_color="#f2f2f2", width=500, height=40,
+        #                                            anchor='w')
+        # self.display_name.grid(row=0, column=0, sticky='w', padx=0, pady=0)
+        #
+        # self.display_availability = customtkinter.CTkLabel(self.scrollable_frame_worker, text="Availability: ",
+        #                                                    font=("Inter", 16), fg_color="#333333", text_color="#f2f2f2",
+        #                                                    width=500, height=40, anchor='w')
+        # self.display_availability.grid(row=1, column=0, sticky='w', padx=0, pady=0)
+        #
+        # self.display_worse_availability = customtkinter.CTkLabel(self.scrollable_frame_worker, text="Worse availability: ",
+        #                                                          font=("Inter", 16), fg_color="#333333",
+        #                                                          text_color="#f2f2f2", width=500, height=40, anchor='w')
+        # self.display_worse_availability.grid(row=2, column=0, sticky='w', padx=0, pady=0)
 
     def update_display_areas(self):
         pass
@@ -413,7 +429,6 @@ class SchedulerSView(customtkinter.CTkFrame):
         #             name_text = f"Name: {entry['name']}"
         #             availability_text = f"Availability: {entry['availability']}"
         #             worse_availability_text = f"Worse availability: {entry['worse_availability']}"
-        #         break
         #
         # self.display_accuracy.configure(text=day_text)
         # self.display_allocation.configure(text=time_frames_text)
