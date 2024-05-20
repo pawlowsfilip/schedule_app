@@ -1,6 +1,6 @@
 import customtkinter
 from CTkToolTip import *
-from CTkXYFrame import *
+from resources.CTkXYFrame import *
 from PIL import Image
 from database.database import write_json
 import json
@@ -307,11 +307,15 @@ class SchedulerSView(customtkinter.CTkFrame):
                         rely=0.10,
                         anchor=customtkinter.CENTER)
 
-        self.scrollable_frame_scheduler = CTkXYFrame(self.r_frame, width=440, height=300, fg_color="#2b2b2b")
-        self.scrollable_frame_scheduler.place(relx=0.085, rely=0.49, anchor=customtkinter.W)
+        # scrollable frame
+        self.scrollable_frame = CTkXYFrame(self.r_frame,
+                                           width=440,
+                                           height=345,
+                                           fg_color="#333333")
 
-        # showing data
-        self.setup_display_areas()
+        self.scrollable_frame.place(relx=0.06,
+                                    rely=0.515,
+                                    anchor=customtkinter.W)
 
         self.export_button = customtkinter.CTkButton(self, text="Export",
                                                      width=250,
@@ -379,62 +383,64 @@ class SchedulerSView(customtkinter.CTkFrame):
     def clear_database(self):
         write_json(self.DATABASE_PATH, [])
 
-    def setup_display_areas(self):
-        pass
-        """
-        it should add something like an object of entry, because there can bne many days, so each day should be
-        appended
-        """
-        # self.display_accuracy = customtkinter.CTkLabel(self.scrollable_frame_scheduler, text="Day: ", font=("Inter", 16),
-        #                                                fg_color="#333333", text_color="#f2f2f2", width=500, height=40,
-        #                                                anchor='w')
-        # self.display_accuracy.grid(row=0, column=0, sticky='w', padx=0, pady=0)
+    def clear_display_areas(self):
+        for widget in self.scrollable_frame.winfo_children():
+            widget.destroy()
 
-        # self.display_allocation = customtkinter.CTkLabel(self.scrollable_frame_scheduler, text="Time frames: ",
-        #                                                  font=("Inter", 16), fg_color="#333333", text_color="#f2f2f2",
-        #                                                  width=500, height=40, anchor='w')
-        # self.display_allocation.grid(row=1, column=0, sticky='w', padx=0, pady=0)
+    @staticmethod
+    def add_labels_to_frame(frame, data, combined_keys):
+        for entry in data:
+            combined_text_list = []
+            for key in combined_keys:
+                if key in entry:
+                    value = entry[key]
+                    if isinstance(value, dict):
+                        formatted_value = ", ".join([f"{k}: {v}" for k, v in value.items()])
+                        combined_text_list.append(f"{key}: {formatted_value}")
+                    else:
+                        combined_text_list.append(f"{key}: {value}")
 
-        # self.display_name = customtkinter.CTkLabel(self.scrollable_frame_worker, text="Name", font=("Inter: ", 16),
-        #                                            fg_color="#333333", text_color="#f2f2f2", width=500, height=40,
-        #                                            anchor='w')
-        # self.display_name.grid(row=0, column=0, sticky='w', padx=0, pady=0)
-        #
-        # self.display_availability = customtkinter.CTkLabel(self.scrollable_frame_worker, text="Availability: ",
-        #                                                    font=("Inter", 16), fg_color="#333333", text_color="#f2f2f2",
-        #                                                    width=500, height=40, anchor='w')
-        # self.display_availability.grid(row=1, column=0, sticky='w', padx=0, pady=0)
-        #
-        # self.display_worse_availability = customtkinter.CTkLabel(self.scrollable_frame_worker, text="Worse availability: ",
-        #                                                          font=("Inter", 16), fg_color="#333333",
-        #                                                          text_color="#f2f2f2", width=500, height=40, anchor='w')
-        # self.display_worse_availability.grid(row=2, column=0, sticky='w', padx=0, pady=0)
+            combined_text = "\n".join(combined_text_list)
+
+            label_button_frame = customtkinter.CTkFrame(frame, fg_color="#333333", width=475, height=60)
+            label_button_frame.grid(sticky='w', padx=0, pady=1)
+
+            label = customtkinter.CTkLabel(label_button_frame,
+                                           text=combined_text,
+                                           font=("Inter", 16),
+                                           fg_color="#333333",
+                                           text_color="#f2f2f2",
+                                           width=391,
+                                           height=65,
+                                           justify="left",
+                                           anchor='w')
+            label.grid(row=0, column=1, sticky='w', padx=0, pady=0)
+
+            button = customtkinter.CTkButton(label_button_frame, text="✕",
+                                             width=30,
+                                             height=20,
+                                             fg_color="#333333",
+                                             text_color="white",
+                                             corner_radius=50,
+                                             hover_color='#a1a1a1',
+                                             font=("Inter", 25, 'bold'),
+                                             command=lambda entry=entry: frame.delete_widget(label, entry))
+            button.grid(row=0, column=0, sticky='e', padx=0, pady=0)
 
     def update_display_areas(self):
-        pass
-        # data_entries = self.read_json_data(self.DATABASE_PATH)
-        #
-        # day_text = "Day: N/A"
-        # time_frames_text = "Time frames: N/A"
-        # name_text = "Name: N/A"
-        # availability_text = "Availability: N/A"
-        # worse_availability_text = "Worse availability: N/A"
-        #
-        # if data_entries:
-        #     for entry in data_entries:
-        #         if "day" in entry and "time_frames" in entry:
-        #             day_text = f"Day: {entry['day']}"
-        #             time_frames_text = f"Time frames: {entry['time_frames']}"
-        #         if "name" in entry:
-        #             name_text = f"Name: {entry['name']}"
-        #             availability_text = f"Availability: {entry['availability']}"
-        #             worse_availability_text = f"Worse availability: {entry['worse_availability']}"
-        #
-        # self.display_accuracy.configure(text=day_text)
-        # self.display_allocation.configure(text=time_frames_text)
-        # self.display_name.configure(text=name_text)
-        # self.display_availability.configure(text=availability_text)
-        # self.display_worse_availability.configure(text=worse_availability_text)
+        data_entries = self.read_json_data(self.DATABASE_PATH)
+
+        self.clear_display_areas()
+
+        # Add new labels
+        scheduler_combined_keys = ["day", "time_frames"]
+        worker_combined_keys = ["name", "availability", "worse_availability"]
+
+        scheduler_data = [entry for entry in data_entries if "day" in entry and "time_frames" in entry]
+        worker_data = [entry for entry in data_entries if "name" in entry]
+
+        self.add_labels_to_frame(self.scrollable_frame, scheduler_data, scheduler_combined_keys)
+        self.add_labels_to_frame(self.scrollable_frame, worker_data, worker_combined_keys)
 
     @staticmethod
     def parse_availability(availability_str):
