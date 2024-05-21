@@ -388,7 +388,7 @@ class SchedulerSView(customtkinter.CTkFrame):
             widget.destroy()
 
     @staticmethod
-    def add_labels_to_frame(frame, data, combined_keys):
+    def add_labels_to_scrollable_frame(frame, data, combined_keys):
         for entry in data:
             combined_text_list = []
             for key in combined_keys:
@@ -439,8 +439,8 @@ class SchedulerSView(customtkinter.CTkFrame):
         scheduler_data = [entry for entry in data_entries if "day" in entry and "time_frames" in entry]
         worker_data = [entry for entry in data_entries if "name" in entry]
 
-        self.add_labels_to_frame(self.scrollable_frame, scheduler_data, scheduler_combined_keys)
-        self.add_labels_to_frame(self.scrollable_frame, worker_data, worker_combined_keys)
+        self.add_labels_to_scrollable_frame(self.scrollable_frame, scheduler_data, scheduler_combined_keys)
+        self.add_labels_to_scrollable_frame(self.scrollable_frame, worker_data, worker_combined_keys)
 
     @staticmethod
     def parse_availability(availability_str):
