@@ -2,6 +2,7 @@ import customtkinter
 from CTkToolTip import *
 from PIL import Image
 from database.database import write_json
+from resources.CTkXYFrame import *
 import json
 
 
@@ -16,6 +17,7 @@ class SchedulerRView(customtkinter.CTkFrame):
         self.clear_database()
         self.pack(fill="both", expand=True)
         self.create_view()
+        self.load_scheduler_data()
 
     def back_to_menu(self):
         # Method to switch back to the default view
@@ -379,8 +381,15 @@ class SchedulerRView(customtkinter.CTkFrame):
                         rely=0.10,
                         anchor=customtkinter.W)
 
-        # # showing data
-        # self.setup_display_areas()
+        # scrollable frame
+        self.scrollable_frame = CTkXYFrame(self.r_frame,
+                                           width=440,
+                                           height=345,
+                                           fg_color="#333333")
+
+        self.scrollable_frame.place(relx=0.06,
+                                    rely=0.53,
+                                    anchor=customtkinter.W)
 
         # export_button
         self.export_button = customtkinter.CTkButton(self, text="Export",
@@ -421,7 +430,7 @@ class SchedulerRView(customtkinter.CTkFrame):
 
             self.update_database([properties])
             self.load_scheduler_data()
-            # self.update_display_areas()
+            self.update_display_areas()
 
     def submit_worker_info(self):
         name_value = self.name_entry.get()
@@ -442,6 +451,7 @@ class SchedulerRView(customtkinter.CTkFrame):
             }
             self.update_database([worker_info])
             self.load_scheduler_data()
+            self.update_display_areas()
 
     def update_database(self, new_entries):
         try:
@@ -464,6 +474,65 @@ class SchedulerRView(customtkinter.CTkFrame):
     def clear_database(self):
         write_json(self.DATABASE_PATH, [])
 
+    def clear_display_areas(self):
+        for widget in self.scrollable_frame.winfo_children():
+            widget.destroy()
+
+    @staticmethod
+    def add_labels_to_scrollable_frame(frame, data, combined_keys):
+        for entry in data:
+            combined_text_list = []
+            for key in combined_keys:
+                if key in entry:
+                    value = entry[key]
+                    if isinstance(value, dict):
+                        formatted_value = ", ".join([f"{k}: {v}" for k, v in value.items()])
+                        combined_text_list.append(f"{key}: {formatted_value}")
+                    else:
+                        combined_text_list.append(f"{key}: {value}")
+
+            combined_text = "\n".join(combined_text_list)
+
+            label_button_frame = customtkinter.CTkFrame(frame, fg_color="#333333", width=475, height=60)
+            label_button_frame.grid(sticky='w', padx=0, pady=3)
+
+            label = customtkinter.CTkLabel(label_button_frame,
+                                           text=combined_text,
+                                           font=("Inter", 16),
+                                           fg_color="#333333",
+                                           text_color="#f2f2f2",
+                                           width=391,
+                                           height=65,
+                                           justify="left",
+                                           anchor='w')
+            label.grid(row=0, column=1, sticky='w', padx=0, pady=0)
+
+            button = customtkinter.CTkButton(label_button_frame, text="✕",
+                                             width=30,
+                                             height=20,
+                                             fg_color="#333333",
+                                             text_color="white",
+                                             corner_radius=50,
+                                             hover_color='#a1a1a1',
+                                             font=("Inter", 25, 'bold'),
+                                             command=lambda entry=entry: frame.delete_widget(label, entry))
+            button.grid(row=0, column=0, sticky='e', padx=0, pady=0)
+
+    def update_display_areas(self):
+        data_entries = self.read_json_data(self.DATABASE_PATH)
+
+        self.clear_display_areas()
+
+        # Add new labels
+        scheduler_combined_keys = ["day", "accuracy", "allocation", "position_priorities"]
+        worker_combined_keys = ["name", "availability", "worse_availability", "position"]
+
+        scheduler_data = [entry for entry in data_entries if "day" in entry and "allocation" in entry]
+        worker_data = [entry for entry in data_entries if "name" in entry]
+
+        self.add_labels_to_scrollable_frame(self.scrollable_frame, scheduler_data, scheduler_combined_keys)
+        self.add_labels_to_scrollable_frame(self.scrollable_frame, worker_data, worker_combined_keys)
+
     @staticmethod
     def parse_availability(availability_str):
         availability_dict = {}
@@ -477,3 +546,8 @@ class SchedulerRView(customtkinter.CTkFrame):
             except ValueError:
                 print("Invalid availability format. Use 'day: time_frame'")
         return availability_dict
+
+    @staticmethod
+    def read_json_data(filepath):
+        with open(filepath, 'r') as file:
+            return json.load(file)
