@@ -339,9 +339,10 @@ class SchedulerSView(customtkinter.CTkFrame):
                 'day': day_value,
                 'time_frames': time_frames_value
             }
-            self.update_database([properties])
-            self.load_scheduler_data()
-            self.update_display_areas()
+            if not self.entry_exists(properties):
+                self.update_database([properties])
+                self.load_scheduler_data()
+                self.update_display_areas()
 
     def submit_worker_info(self):
         name_value = self.name_entry.get()
@@ -358,9 +359,18 @@ class SchedulerSView(customtkinter.CTkFrame):
                 'availability': availability_dict,
                 'worse_availability': worse_availability_dict
             }
-            self.update_database([worker_info])
-            self.load_scheduler_data()
-            self.update_display_areas()
+            if not self.entry_exists(worker_info):
+                self.update_database([worker_info])
+                self.load_scheduler_data()
+                self.update_display_areas()
+
+    def entry_exists(self, new_entry):
+        try:
+            with open(self.DATABASE_PATH, 'r') as file:
+                data = json.load(file)
+            return new_entry in data
+        except (FileNotFoundError, json.JSONDecodeError):
+            return False
 
     def update_database(self, new_entries):
         try:
@@ -387,8 +397,7 @@ class SchedulerSView(customtkinter.CTkFrame):
         for widget in self.scrollable_frame.winfo_children():
             widget.destroy()
 
-    @staticmethod
-    def add_labels_to_scrollable_frame(frame, data, combined_keys):
+    def add_labels_to_scrollable_frame(self, frame, data, combined_keys):
         for entry in data:
             combined_text_list = []
             for key in combined_keys:
@@ -424,8 +433,24 @@ class SchedulerSView(customtkinter.CTkFrame):
                                              corner_radius=50,
                                              hover_color='#a1a1a1',
                                              font=("Inter", 25, 'bold'),
-                                             command=lambda entry=entry: frame.delete_widget(label, entry))
+                                             command=lambda e=entry, w=label_button_frame: self.delete_widget(e, w))
             button.grid(row=0, column=0, sticky='e', padx=0, pady=0)
+
+    def delete_widget(self, entry_to_delete, widget_to_destroy):
+        try:
+            with open(self.DATABASE_PATH, 'r') as file:
+                data = json.load(file)
+
+            data = [entry for entry in data if entry != entry_to_delete]
+
+            with open(self.DATABASE_PATH, 'w') as file:
+                json.dump(data, file, indent=4)
+
+            widget_to_destroy.destroy()
+            self.update_display_areas()
+
+        except Exception as e:
+            print(f"Error deleting entry: {e}")
 
     def update_display_areas(self):
         data_entries = self.read_json_data(self.DATABASE_PATH)
