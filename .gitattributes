@@ -1,0 +1,2 @@
+dist/Scheduler_1_0.exe filter=lfs diff=lfs merge=lfs -text
+build/Scheduler_1_0/Scheduler_1_0.pkg filter=lfs diff=lfs merge=lfs -text
